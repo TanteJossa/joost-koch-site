@@ -10,7 +10,9 @@ div
 
 <script>
 // Data 
-import { getFontSizeToFit } from '@/helpers'
+// import { getFontSizeToFit } from '@/helpers'
+// import { Notomoji } from '@svgmoji/notomoji';
+// import data from 'svgmoji/emoji.json';
 
 // Components
 
@@ -38,7 +40,7 @@ export default {
             emojis: [
                 '😂',
                 '😎',
-                '🎬🎬'
+                '🎬'
             ]
         }
     },
@@ -57,29 +59,32 @@ export default {
             ctx.save();
             ctx.clearRect(0, 0, 1000, 1000);
             ctx.translate(0, 500);
+            const font_size = 400
             // ctx.scale(0.4, 0.4);
             // ctx.strokeStyle = "white";
             // ctx.fillStyle = "white";
             // ctx.lineWidth = 8;
             // ctx.lineCap = "round";
             const fontface = 'serif'
-            ctx.font = "400px "+fontface ;
+            ctx.font = font_size+"px "+fontface ;
             ctx.fillText("J     "+"st Koch", 50, 50)
 
             const emoji = this.emojis[index]
-            const text = ctx.measureText(emoji); // TextMetrics object
             
             ctx.font = `1px ${fontface}`;
-            const max_width  = ctx.measureText("     ").width 
+            const max_width  = ctx.measureText("      ").width 
             
-            const width = max_width / ctx.measureText(text).width;
+            const width = max_width / ctx.measureText(emoji).width;
             console.log({
                 max_width,
-                width
+                width,
+                1: ctx.measureText('🎬🎬').width,
+                2: ctx.measureText('🎬').width,
+                3: ctx.measureText('😼').width
             })
-            ctx.font = ( width * 400)+"px "+fontface;
+            ctx.font = ( width * font_size)+"px "+fontface;
 
-            ctx.fillText(emoji, 80, 75)
+            ctx.fillText(emoji, 140, 200)
 
             ctx.restore();
 
