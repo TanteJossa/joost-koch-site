@@ -1,25 +1,33 @@
 <template lang="pug">
-    v-container.fill-height.d-flex.align-center.justify-center
-        div.glitch-text(style="text-align: center;")
+    div.h-100.w-100(style="position: relative")
 
-            h1(style="font-size: calc(100vw / 9); display: inline-block;")
-                | J
-                Eyes
-                | st Koch
-            //- paper-airplane(
-            //-     v-for="(airplane, index) in airplanes"
-            //-     :key="index"
-            //-     :x="airplane.x"
-            //-     :y="airplane.y"
-            //-     :initialAngle="airplane.angle"
-            //- )
-        Wood
+
+        WoodTexture(style="pointer-events: all;" ref="woodTexture")
+        div.fill-height.d-flex.align-center.justify-center.h-100.w-100(
+            style="position: absolute; top: 0; left: 0;"
+            @mousemove="woodMouseMove"
+        )
+
+            div.glitch-text(style="text-align: center;")
+
+                h1(style="font-size: calc(min(100vw, 600px) / 5); display: inline-block")
+                    | J
+                    Eyes
+                    | st Koch
+                //- paper-airplane(
+                //-     v-for="(airplane, index) in airplanes"
+                //-     :key="index"
+                //-     :x="airplane.x"
+                //-     :y="airplane.y"
+                //-     :initialAngle="airplane.angle"
+                //- )
+
 </template>
 
 <script>
 import PaperAirplane from '@/components/PaperAirplane.vue';
 import Eyes from '@/components/Eyes.vue';
-import Wood from '@/components/Wood.vue';
+import WoodTexture from '@/components/WoodTexture.vue';
 import { PowerGlitch } from 'powerglitch'
 
 export default {
@@ -27,7 +35,7 @@ export default {
     components: {
         PaperAirplane,
         Eyes,
-        Wood
+        WoodTexture
     },
     setup(){
 
@@ -74,7 +82,12 @@ export default {
 
     },
     methods: {
+        woodMouseMove(event){
+            const component = this.$refs.woodTexture;
+            if (!component) return;
+            component.$el.dispatchEvent(new MouseEvent("mousemove" ,event))
 
+        }
     }
 };
 </script>

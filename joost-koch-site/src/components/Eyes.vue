@@ -14,7 +14,7 @@ span(style="display: inline-flex; align-items: center")
                     circle(xmlns="http://www.w3.org/2000/svg" fill="#292F33" cx="50%" cy="50%" r="20%")
                     circle(xmlns="http://www.w3.org/2000/svg" fill="#F5F8FA" cx="70%" cy="40%" r="8%")
 
-    div.ml-2(style="position: relative; width:0.3em; height:0.6em")
+    div(style="position: relative; width:0.3em; height:0.6em; margin-left: 0.05em")
         div.w-100.h-100(style="position: absolute; top: 0; left: 0; background-color: grey; clip-path: ellipse(50% 50%)")
 
         div.w-100.h-100(style="position: absolute; top: 0; left: 0; background-color: white; clip-path: ellipse(43% 45%)" ref="eyeRight")
