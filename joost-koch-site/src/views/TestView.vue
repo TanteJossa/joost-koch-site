@@ -1,14 +1,16 @@
 <template lang="pug">
     div.h-100.w-100(style="position: relative")
 
-
-        WoodTexture(style="pointer-events: all;" ref="woodTexture")
+        
+        //- WoodTexture(style="pointer-events: all;" ref="woodTexture")
         div.fill-height.d-flex.align-center.justify-center.h-100.w-100(
             style="position: absolute; top: 0; left: 0;"
             @mousemove="woodMouseMove"
         )
+            FoldingPaper()
+                p Hello how are you
 
-            div.glitch-text(style="text-align: center;")
+            div.w-auto.glitch-text(style="text-align: center;")
 
                 h1(style="font-size: calc(min(100vw, 600px) / 5); display: inline-block")
                     | J
@@ -29,13 +31,14 @@ import PaperAirplane from '@/components/PaperAirplane.vue';
 import Eyes from '@/components/Eyes.vue';
 import WoodTexture from '@/components/WoodTexture.vue';
 import { PowerGlitch } from 'powerglitch'
-
+import FoldingPaper from '@/components/FoldingPaper.vue'; // Adjust path as needed
 export default {
     name: 'TestView',
     components: {
         PaperAirplane,
         Eyes,
-        WoodTexture
+        WoodTexture,
+        FoldingPaper
     },
     setup(){
 

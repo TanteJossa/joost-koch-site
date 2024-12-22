@@ -12,6 +12,7 @@
     "@svgmoji/noto": "^3.2.0",
     "p5": "^1.11.2",
     "pinia": "^2.1.4",
+    "pixi.js": "^8.6.6",
     "powerglitch": "^2.3.4",
     "roboto-fontface": "*",
     "simplex-noise": "^4.0.3",
