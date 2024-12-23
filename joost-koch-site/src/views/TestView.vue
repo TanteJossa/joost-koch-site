@@ -2,20 +2,33 @@
     div.h-100.w-100(style="position: relative")
 
         
-        //- WoodTexture(style="pointer-events: all;" ref="woodTexture")
-        div.fill-height.d-flex.align-center.justify-center.h-100.w-100(
-            style="position: absolute; top: 0; left: 0;"
+        WoodTexture(style="pointer-events: all;" ref="woodTexture")
+        div.fill-height.w-100(
+            style="position: absolute; top: 0; left: 0; "
             @mousemove="woodMouseMove"
-        )
-            FoldingPaper()
-                p Hello how are you
+        )   
+            HomeGrid
+                template(#name)
+                    div.glitch-text.h-100.d-flex.align-center.justify-center(style="text-align: center;")
 
-            div.w-auto.glitch-text(style="text-align: center;")
+                        h1(style="font-size: calc(min(100vw, 600px) / 5); display: inline-block;")
+                            | J
+                            Eyes
+                            | st Koch
+            //- v-row
+                v-col
+                    div(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
+                        MulticoloredText(
+                            text="Projecten"
+                        )
+                    div.d-flex.flex-wrap
+                        PostIt()
+                            i Hello how are you
+                v-col
+                    div
 
-                h1(style="font-size: calc(min(100vw, 600px) / 5); display: inline-block")
-                    | J
-                    Eyes
-                    | st Koch
+
+
                 //- paper-airplane(
                 //-     v-for="(airplane, index) in airplanes"
                 //-     :key="index"
@@ -31,14 +44,18 @@ import PaperAirplane from '@/components/PaperAirplane.vue';
 import Eyes from '@/components/Eyes.vue';
 import WoodTexture from '@/components/WoodTexture.vue';
 import { PowerGlitch } from 'powerglitch'
-import FoldingPaper from '@/components/FoldingPaper.vue'; // Adjust path as needed
+import PostIt from '@/components/PostIt.vue'; // Adjust path as needed
+import MulticoloredText from '@/components/MulticoloredText.vue';
+import HomeGrid from '@/components/HomeGrid.vue';
 export default {
     name: 'TestView',
     components: {
         PaperAirplane,
         Eyes,
         WoodTexture,
-        FoldingPaper
+        PostIt,
+        MulticoloredText,
+        HomeGrid
     },
     setup(){
 

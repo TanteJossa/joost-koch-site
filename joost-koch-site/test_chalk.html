@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chalk Text Effect</title>
+<style>
+  body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #384e32; /* Dark green blackboard color */
+  }
+
+  canvas {
+    border: none; /* Optional: Remove canvas border */
+  }
+</style>
+</head>
+<body>
+
+  <canvas id="chalkCanvas" width="500" height="200"></canvas>
+
+  <script>
+    const canvas = document.getElementById('chalkCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const text = "HTML";
+    const fontSize = 100;
+    const fontFamily = 'Arial Black, sans-serif'; // Choose a bold, sans-serif font
+    const textColor = 'rgba(255, 255, 255, 0.9)'; // Slightly transparent white for chalk effect
+    const chalkColorVariations = ['rgba(255, 255, 255, 0.8)', 'rgba(240, 240, 240, 0.7)', 'rgba(255, 255, 255, 0.95)'];
+    const offsetX = 2;
+    const offsetY = 2;
+    const numLayers = 5;
+
+    ctx.fillStyle = '#384e32'; // Background color
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const textX = canvas.width / 2;
+    const textY = canvas.height / 2;
+
+    for (let i = 0; i < numLayers; i++) {
+      const variationColor = chalkColorVariations[Math.floor(Math.random() * chalkColorVariations.length)];
+      const randomOffsetX = (Math.random() - 0.5) * offsetX;
+      const randomOffsetY = (Math.random() - 0.5) * offsetY;
+
+      ctx.fillStyle = variationColor;
+      ctx.fillText(text, textX + randomOffsetX, textY + randomOffsetY);
+    }
+
+    // Optional: Add some subtle noise
+    function addNoise(ctx, width, height, opacity) {
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const pixels = imageData.data;
+      const numPixels = pixels.length;
+      for (let i = 0; i < numPixels; i += 4) {
+        const random = Math.random();
+        if (random < opacity) {
+          const color = Math.random() > 0.5 ? 255 : 200;
+          pixels[i] = color;     // Red
+          pixels[i + 1] = color; // Green
+          pixels[i + 2] = color; // Blue
+          // Alpha remains the same
+        }
+      }
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    addNoise(ctx, canvas.width, canvas.height, 0.01); // Adjust opacity for more/less noise
+
+    // Optional: Add a slightly rough edge by drawing the text with a subtle stroke
+    ctx.strokeStyle = 'rgba(200, 200, 200, 0.1)';
+    ctx.lineWidth = 1;
+    ctx.strokeText(text, textX, textY);
+
+  </script>
+
+</body>
+</html>
