@@ -1,14 +1,13 @@
 <template lang="pug">
-div(:style="{'transform': 'rotate('+deg+'deg)' }")
-    .paper.pa-2.pt-6
-        img(
-            src='@/assets/thumbtack.png'
-            style="position: absolute; top: 0; left: 0px; width: 40px; height: 40px; z-index: 3"
-        )
-        div(style="position: absolute; top: 0: left: 0")
-            slot()
-        slot()
-        .color-overlay
+.paper.pa-2.pt-6(:style="{'transform': 'rotate('+deg+'deg)','z-index': 3}" :class="shadow")
+    img(
+        src='@/assets/thumbtack.png'
+        style="position: absolute; top: 0; left: 0px; width: 40px; height: 40px; z-index: 3"
+    )
+    div(style="position: absolute; top: 0: left: 0; z-index: 3")
+        slot
+    slot
+    .color-overlay
 </template>
 
 <script>
@@ -22,7 +21,10 @@ export default {
 
     },
     props: {
-
+        is_clickable: {
+            type: Boolean,
+            default: false
+        },
     },
     emits: [],
     setup() {
@@ -34,11 +36,17 @@ export default {
     data(){
         return {
             gradient: '',
-            deg: Math.random() * 10 - 20
+            deg: Math.random() * 20 - 10
         }
     },
     computed: {
-
+        shadow(){
+            if (this.is_clickable){
+                return 'hover-shadow'
+            } else {
+                return 'shadow'
+            }
+        }
     },
     methods: {
 
@@ -93,7 +101,7 @@ export default {
 
 /* Add a subtle color overlay. This can be any color */
 .color-overlay {
-  background: hsla(40, 90%, 70%, 0.5);
+  background: hsla(40, 69%, 42%, 0.608);
   mix-blend-mode: overlay;
   position: absolute;
   top: 0;
@@ -103,4 +111,19 @@ export default {
   z-index: 1;
 }
 
+.hover-shadow, .shadow {
+    -webkit-box-shadow: 2px 3px 3px 1px rgba(0,0,0,0.75);
+    -moz-box-shadow: 2px 3px 3px 1px rgba(0,0,0,0.75);
+    box-shadow: 2px 3px 3px 1px rgba(0,0,0,0.75);
+    transition: all 0.2s;
+}
+
+
+
+.hover-shadow:hover {
+    -webkit-box-shadow: 7px 8px 18px 4px rgba(0,0,0,0.48);
+    -moz-box-shadow: 7px 8px 18px 4px rgba(0,0,0,0.48);
+    box-shadow: 7px 8px 18px 4px rgba(0,0,0,0.48);
+    transform: scale(1.1);
+}
 </style>

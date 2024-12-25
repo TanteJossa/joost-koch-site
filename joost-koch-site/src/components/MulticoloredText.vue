@@ -1,6 +1,6 @@
 <template lang="pug">
-span
-  span(v-for="(letter, index) in letters" :key="index" :style="{ color: colors[index] }") {{ letter }}
+span(:class="is_clickable ? 'text-hover' : ''")
+    span(v-for="(letter, index) in letters" :key="index" :style="{ color: colors[index] }") {{ letter }}
 </template>
 
 <script>
@@ -18,6 +18,10 @@ export default {
             type: String,
             required: true,
             default: ''
+        },
+        is_clickable: {
+            type: Boolean,
+            default: false
         }
     },
     emits: [],
@@ -65,5 +69,11 @@ export default {
 </script>
 
 <style scoped>
-
+.text-hover{
+    transition: 0.2s all;
+}
+.text-hover:hover{
+    text-shadow: 5px 6px 12px  ;
+    transform: scale(1.1);
+}
 </style>
