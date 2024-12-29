@@ -111,19 +111,5 @@ export default {
   z-index: 1;
 }
 
-.hover-shadow, .shadow {
-    -webkit-box-shadow: 2px 3px 3px 1px rgba(0,0,0,0.75);
-    -moz-box-shadow: 2px 3px 3px 1px rgba(0,0,0,0.75);
-    box-shadow: 2px 3px 3px 1px rgba(0,0,0,0.75);
-    transition: all 0.2s;
-}
 
-
-
-.hover-shadow:hover {
-    -webkit-box-shadow: 7px 8px 18px 4px rgba(0,0,0,0.48);
-    -moz-box-shadow: 7px 8px 18px 4px rgba(0,0,0,0.48);
-    box-shadow: 7px 8px 18px 4px rgba(0,0,0,0.48);
-    transform: scale(1.1);
-}
 </style>

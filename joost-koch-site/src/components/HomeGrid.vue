@@ -5,19 +5,19 @@
             p div1 
     .div2.mx-auto
         slot(name="name")
-            p div2   
+            p name   
     .div3
-        slot(name="div3")
-            p div3   
+        slot(name="div2")
+            p div2 
     .div4
-        slot(name="div4")
-            p div4   
+        slot(name="div3")
+            p div3
     .div5
-        slot(name="div5")
-            p div5   
+        slot(name="div4")
+            p div4
     .div6
-        slot(name="div6")
-            p div6   
+        slot(name="div5")
+            p div5
 </template>
 
 <script>

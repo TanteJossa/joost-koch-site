@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Google Drive File IDs</title>
+</head>
+<body>
+
+<h1>Google Drive File IDs</h1>
+<p>This page will attempt to list file IDs from a shared Google Drive folder.</p>
+<p><strong>Important:</strong> This method relies on the user being logged into their Google account and the folder being shared with them. It does not use an API key and has limitations due to CORS.</p>
+
+<div id="fileIds">
+  <p>Loading file IDs...</p>
+</div>
+
+<script>
+  // Replace 'YOUR_FOLDER_ID' with the actual ID of your shared Google Drive folder
+  const folderId = '17sYJTN8jVOiBp_U05hyRRJorBtMQQm10';
+
+  document.addEventListener('DOMContentLoaded', function() {
+    loadFileIds();
+  });
+
+  async function loadFileIds() {
+    const fileIdsDiv = document.getElementById('fileIds');
+    fileIdsDiv.innerHTML = '<p>Loading file IDs...</p>';
+
+    try {
+      // Construct the Google Picker API URL
+      const pickerApiUrl = `https://picker.google.com/api/picker/v1/picker?origin=${window.location.origin}&nav=false&multiselect=true&ids=${folderId}`;
+
+      // Create an iframe to load the Google Picker
+      const iframe = document.createElement('iframe');
+      iframe.src = pickerApiUrl;
+      iframe.style.display = 'none'; // Hide the iframe
+
+      document.body.appendChild(iframe);
+
+      // Listen for messages from the iframe
+      window.addEventListener('message', handlePickerResponse);
+
+    } catch (error) {
+      console.error("Error loading file IDs:", error);
+      fileIdsDiv.innerHTML = `<p>Error loading file IDs: ${error.message}</p>`;
+    }
+  }
+
+  function handlePickerResponse(event) {
+    // Check if the message is from the Google Picker iframe
+    if (event.origin === 'https://picker.google.com') {
+      try {
+        const data = JSON.parse(event.data);
+        const fileIdsDiv = document.getElementById('fileIds');
+        fileIdsDiv.innerHTML = ''; // Clear loading message
+
+        if (data && data.docs && data.docs.length > 0) {
+          const ul = document.createElement('ul');
+          data.docs.forEach(doc => {
+            const li = document.createElement('li');
+            li.textContent = doc.id;
+            ul.appendChild(li);
+          });
+          fileIdsDiv.appendChild(ul);
+        } else {
+          fileIdsDiv.innerHTML = '<p>No files found in the specified folder or access denied.</p>';
+        }
+      } catch (error) {
+        console.error("Error processing Picker response:", error);
+        const fileIdsDiv = document.getElementById('fileIds');
+        fileIdsDiv.innerHTML = `<p>Error processing file information.</p>`;
+      }
+
+      // Clean up the iframe
+      const iframe = document.querySelector('iframe');
+      if (iframe) {
+        document.body.removeChild(iframe);
+      }
+      window.removeEventListener('message', handlePickerResponse);
+    }
+  }
+</script>
+
+</body>
+</html>

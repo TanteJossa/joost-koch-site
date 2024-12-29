@@ -57,4 +57,7 @@ export default defineConfig({
         },
         },
     },
+    build: {
+        sourcemap: 'hidden' // Generates sourcemap but doesn't link it
+    }
 })
