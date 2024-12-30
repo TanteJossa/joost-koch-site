@@ -155,7 +155,7 @@
                             loading="lazy"
                         )
 
-                    div.d-flex.flex-wrap
+                    div.ml-3.d-flex.flex-wrap
                         v-icon.hover-shadow(
                             style="font-size: 50px"
                             icon="mdi-github"
@@ -175,6 +175,16 @@
                             style="font-size: 50px"
                             icon="mdi-spotify"
                             @click="open('https://open.spotify.com/user/q1v0gsdavetx3m2k1jm472nhx?si=5d330fcfbc3046e6')"
+                        )
+                        img.ml-2.hover-shadow(
+                            style="font-size: 50px; width: 50px; height: 50px; color: white"
+                            src="@/assets/Bluesky_Logo.svg"
+                            @click="open('https://bsky.app/profile/joost-koch.nl')"
+                        )
+                        v-icon.ml-2.hover-shadow(
+                            style="font-size: 50px"
+                            icon="mdi-twitter"
+                            @click="open('https://x.com/TanteJossa')"
                         )
                 template(#div5)
                     div
