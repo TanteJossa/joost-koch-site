@@ -53,7 +53,7 @@
                                 v-for="(image, index) in shown_images"
                                 @mouseover="image_hover_index = index"
                                 @mouseleave="image_hover_index = -1"
-                                :style="{'transform': 'rotate('+image.rotation+'deg)', 'max-height': 'calc('+(100 - image.top ) + '%' + (index < 1 ? ' - 80px)' : ')'), top:  'calc('+( image.top ) + '%' + (index < 1 ? ' +  80px)' : ')'), position: 'absolute', left: index * (100) / shown_images.length  + '%', 'z-index': image_hover_index == index ? '10 !important' : image.z_index}"
+                                :style="{'transform': 'rotate('+image.rotation+'deg)', 'max-height': 'calc('+(100 - image.top ) + '%' + (index < 1 ? ' - 30px)' : ')'), top:  'calc('+( image.top ) + '%' + (index < 1 ? ' +  40px)' : ')'), position: 'absolute', left: index * (80) / shown_images.length  + '%', 'z-index': image_hover_index == index ? '10 !important' : image.z_index}"
                                 :image="image.imageUrl"
                                 :date="image.date ? image.date : undefined"
                             )
@@ -81,7 +81,6 @@
                         v-radio-group(
                             v-model="media_type"
                             inline
-                            :disabled="loading_media"
                         )
                             v-radio(
                                 value="movies"
@@ -128,7 +127,7 @@
                              
                             )
                 template(#div4)
-                    div(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
+                    div.ml-3(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
                         MulticoloredText(
                             text="Links"
                         )
@@ -155,7 +154,7 @@
                             loading="lazy"
                         )
 
-                    div.ml-3.d-flex.flex-wrap
+                    div.mb-3.ml-3.d-flex.flex-wrap
                         v-icon.hover-shadow(
                             style="font-size: 50px"
                             icon="mdi-github"
@@ -349,9 +348,9 @@ export default {
 
             images: [],
             image_hover_index:-1,
-            images_text_rotation: Math.random() * 15 - 7.5,
-            projects_text_rotation: Math.random() * 15 - 7.5,
-            media_text_rotation: Math.random() * 10 - 5,
+            images_text_rotation: (Math.random() * 15 - 7.5) * 0,
+            projects_text_rotation: (Math.random() * 15 - 7.5) * 0,
+            media_text_rotation: (Math.random() * 10 - 5) * 0,
 
             media_type: Math.random() > 0.5 ? 'series' : 'movies',
 
@@ -564,8 +563,10 @@ export default {
         async loadMedia(){
             this.loading_media = true
 
-            this.series = await this.getSheetData(5, "Series", 0, this.media_is_sorted)
-            this.movies = await this.getSheetData(5, "Films", 0, this.media_is_sorted)
+
+            const [serie_result, movie_result] = await Promise.all([this.getSheetData(5, "Series", 0, this.media_is_sorted), this.getSheetData(5, "Films", 0, this.media_is_sorted)])
+            this.series = serie_result
+            this.movies = movie_result
             console.log(this.series, this.movies)
             this.loading_media = false
         
@@ -633,9 +634,8 @@ export default {
             observer.observe(projects_container);
         }
         this.shown_projects = this.shownProjects()
-
-        await this.loadRandomImages() 
-        await this.loadMedia()
+        
+        await Promise.all([this.loadRandomImages(), this.loadMedia()])
 
 
     },

@@ -41,6 +41,7 @@ export default {
     },
     methods: {
         generateRandomColor() {
+            return '#ffffff'
             const letters = '0123456789ABCDEF';
             let color = '#';
             for (let i = 0; i < 6; i++) {
