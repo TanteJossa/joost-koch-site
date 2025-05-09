@@ -1,0 +1,65 @@
+Instructions for LLM: Generating CV Project Descriptions
+
+Your primary goal is to generate compelling and concise project descriptions suitable for a Curriculum Vitae (CV) or professional portfolio website. These descriptions will populate the `description` field in a `projects.json` file.
+
+**1. Target Audience & Purpose:**
+   - The descriptions are for potential employers, collaborators, or anyone reviewing a professional profile.
+   - The main purpose is to showcase skills, responsibilities, achievements, and the impact of the project.
+
+**2. Tone and Language Style:**
+   - **Professional and Achievement-Oriented:** Focus on what was accomplished and the value delivered.
+   - **Concise and Impactful:** Get straight to the point. Avoid jargon where possible, or explain it briefly if essential.
+   - **Active Voice:** Use strong action verbs to start sentences or bullet points.
+     - *Example (Good):* "Developed a Python script that automated data processing, reducing manual effort by 30%."
+     - *Example (Bad):* "Data processing was automated by a Python script, and it reduced manual effort."
+   - **Quantifiable Achievements:** Whenever possible, quantify your achievements with numbers, percentages, or specific outcomes.
+     - *Example:* "Increased user engagement by 25%," or "Processed 10,000+ records daily."
+   - **Keywords:** Incorporate relevant technical and industry-specific keywords naturally.
+
+**3. Content and Structure:**
+   - **Length:** Aim for 2-4 impactful sentences or a short bulleted list (2-3 points) per project.
+   - **Focus on:**
+     - Your specific role and contributions.
+     - Key challenges overcome and solutions implemented.
+     - The technologies and tools you utilized effectively (refer to the `technologies` field in `projects.json`).
+     - The project's outcome or impact.
+   - **Incorporate Project Context:**
+     - **`technologies`:** Weave in key technologies naturally.
+       - *Example:* "Leveraged React and Node.js to build a responsive front-end and robust back-end for..."
+     - **`status`:** The project's `status` (e.g., "Completed", "Live", "Exploratory") can frame the description.
+       - *Example (for "Exploratory"):* "Explored the application of machine learning for X, developing a functional prototype that demonstrated Y."
+   - **What to Avoid:**
+     - Vague statements (e.g., "Worked on a cool project.").
+     - Exaggerations or unsupported claims.
+     - Overly informal language.
+
+**4. Formatting (for the `description` field):**
+   - **Markdown:** You can use Markdown for basic formatting:
+     - `**bold**` for emphasis.
+     - `*italics*` for subtle emphasis.
+     - `- Unordered list item 1`
+     - `  - Nested list item`
+     - `1. Ordered list item 1`
+   - **Inline Images:** To embed an image directly within the description, use the placeholder `{{image_name.extension}}`.
+     - The image file (e.g., `system-architecture.png`) must exist in the project's specific asset directory: `src/assets/projects/[project_id]/image_name.extension`.
+     - Use this sparingly and only if the image directly supports the description's narrative for a CV context (e.g., a key architectural diagram you designed).
+
+**5. Example of a Good Project Description (for CV):**
+
+   *Given `projects.json` entry snippet:*
+   ```json
+   {
+     "title": "AI-Powered Customer Support Chatbot",
+     "technologies": ["Python", "Dialogflow", "Flask", "Google Cloud"],
+     "status": "Live"
+   }
+   ```
+
+   *Generated `description`:*
+   "Spearheaded the development of an AI-powered customer support chatbot using Python, Dialogflow, and Flask, deployed on Google Cloud. Reduced customer query resolution time by 40% and improved user satisfaction scores by 15%. Key responsibilities included intent recognition design and API integration for backend services."
+
+   *Alternatively, using bullets:*
+   "- Led the design and implementation of an AI chatbot using Python and Dialogflow, resulting in a 40% decrease in query resolution time.\n- Engineered the Flask backend and integrated it with Google Cloud services for scalable deployment.\n- Enhanced user satisfaction by 15% through iterative improvements to intent recognition and response accuracy."
+
+**Overall Goal:**
+Produce project descriptions that are informative, highlight skills and achievements effectively, and are tailored for a professional CV presentation.

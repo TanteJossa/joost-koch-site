@@ -1,0 +1,230 @@
+[
+  {
+    "id": "pws-gradeWithAi",
+    "title": "PWS: AI-Powered Automatic Assessment System",
+    "date": "2025-02-23T12:00:00.000Z",
+    "rank": 1,
+    "tags": [
+      "AI",
+      "Machine Learning",
+      "Education",
+      "Assessment Automation",
+      "Python",
+      "Vue.js",
+      "Google Cloud Platform",
+      "PWS",
+      "OCR",
+      "NLP"
+    ],
+    "url": "https://toetspws.web.app/",
+    "status": "Completed",
+    "team": [
+      "J. K. Wijker",
+      "J. K. Koch"
+    ],
+    "technologies": [
+      "Python",
+      "Flask",
+      "OpenCV",
+      "PyTorch",
+      "Google Cloud Platform (GCP)",
+      "Vue.js",
+      "Vuetify",
+      "Firebase",
+      "Node.js",
+      "Machine Learning",
+      "OCR",
+      "NLP"
+    ],
+    "description": "This project, a *Profielwerkstuk (PWS)* which is a Dutch high school final research project, showcases an innovative system for **Fully Automatic Assessment of handwritten tests using Artificial Intelligence**. Developed by J. K. Wijker & J. K. Koch, the system aims to revolutionize how teachers create, scan, grade, and analyze student assessments.\n\nVisit the demo site: [toetspws.web.app](https://toetspws.web.app/)\n\n**Core Capabilities:**\n\n*   **Test Creation:**\n    *   Dynamically generate tests for various subjects, complete with questions, scoring, and learning objectives in under a minute.\n    *   Supports mathematical formulas and tables, with output to `.docx` in exam format.\n*   **Scanning & OCR:**\n    *   Processes handwritten answer sheets, recognizing diverse handwriting styles and student IDs.\n    *   Efficiently scans a class of 30 students in approximately 5 minutes.\n    *   Identifies answer locations accurately.\n*   **AI-Powered Grading:**\n    *   Grades open-ended, closed, and even drawing-based questions.\n    *   Demonstrated a **97% correlation with human grading** in a real-world chemistry test.\n    *   Provides granular feedback per point and offers study tips, reducing grading time for a class to about 5 minutes.\n*   **In-depth Analysis:**\n    *   Generates individual student PDF reports with detailed feedback.\n    *   Tracks student performance against learning objectives.\n    *   Provides teachers with class-wide insights into achieved learning goals.\n\n**Research & Development Insights:**\n\n*   **Extensive AI Model Evaluation:** Compared over 14 AI models through 15,000+ automated API requests, exploring technologies like YOLO, LLMs, and diffusion models.\n*   **Teacher-Centric Design:** Incorporated feedback from a survey of 51 teachers to align the system with practical needs.\n*   **Robust Tech Stack:** {{tech_stack_diagram.png}}\n    *   **Backend:** Python, Flask, running on Google Cloud Platform, utilizing libraries such as OpenCV, PyTorch, NumPy, and Pandas. The research phase involved ~4000 lines of Python, and the production backend ~3500 lines.\n    *   **Frontend:** Modern web application built with Node.js, Vite, Vue.js, and Vuetify, hosted on Google Firebase. Features a comprehensive OOP-based data system. Total frontend code is around ~8000 lines.\n\nThis PWS successfully demonstrates a powerful and practical application of AI in education, offering significant time savings and enhanced analytical capabilities for teachers.\n\n**Source Code (components):**\n*: [github.com/TanteJossa/PWS-gradeWithAi](https://github.com/TanteJossa/PWS-gradeWithAi)\n* \n\nThe full research paper (PWS document) provides further details on the methodology and findings.",
+    "images": [
+      "pws_cover.png",
+      "system_flowchart.png",
+      "checkbox_example.png",
+      "grading_feedback_example.png"
+    ],
+    "pdfs": [
+      "PWS-NakijkenMetAI.pdf"
+    ]
+  },
+  {
+    "id": "joost-koch-site",
+    "title": "Personal Portfolio Website",
+    "date": "2023-10-26T10:00:00.000Z",
+    "rank": 2,
+    "tags": [
+      "Portfolio",
+      "Vue.js",
+      "Frontend",
+      "Web Development",
+      "JavaScript"
+    ],
+    "github": "https://github.com/TanteJossa/joost-koch-site",
+    "url": "https://joostkoch.com",
+    "status": "Live",
+    "team": [
+      "Joost Koch"
+    ],
+    "technologies": [
+      "Vue.js 3",
+      "JavaScript",
+      "HTML5",
+      "CSS3",
+      "Vite"
+    ],
+    "description": "This is my personal portfolio website, built from scratch using **Vue.js 3** and Vite. It serves as a central hub to showcase my projects, skills, and share a bit more about my journey in technology. I focused on creating a clean, responsive design with engaging elements like a dynamic particle background. The site is continuously updated with new projects and experiences.\n\nKey features include:\n*   Project listings dynamically loaded from a JSON file.\n*   Responsive design for optimal viewing on all devices.\n*   Interactive background animations."
+  },
+  {
+    "id": "miband8-watchfaces",
+    "title": "Mi Band 8 Custom Watchface Exploration",
+    "date": "2023-10-26T10:00:00.000Z",
+    "rank": 3,
+    "tags": [
+      "Wearables",
+      "Mi Band",
+      "Customization",
+      "Firmware",
+      "Personal Project"
+    ],
+    "github": "https://github.com/TanteJossa/miband8-watchfaces",
+    "status": "Exploratory",
+    "team": [
+      "Joost Koch"
+    ],
+    "technologies": [
+      "Watchface Design",
+      "EasyFace Tool",
+      "Proprietary Binary Formats",
+      "Image Editing"
+    ],
+    "description": "An exploration into creating custom watch faces for the Xiaomi Mi Band 8. This project involved understanding the proprietary watch face format, following community guides, and designing unique interfaces.\n\n**Key Steps & Learnings:**\n\n*   **Research & Tooling:** Leveraged community resources (like [bandbbs.cn](https://www.bandbbs.cn/threads/7188/#post-346061)) and tools such as `EasyFace.exe` for watch face creation.\n*   **Asset Preparation:** Involved creating and managing PNG image resources for various watch face elements like background, time digits, date, day of the week, and icons for steps, heart rate, battery, etc.\n*   **Layout & Design with EasyFace:** Utilized the EasyFace tool to visually position elements, link them to data sources (e.g., hour-tens, minute-ones, week), and configure display properties such as high-order blanking for numbers.\n*   **AOD (Always-On Display):** Learned the necessity of creating a corresponding AOD (Always-On Display) version for custom watch faces on the Mi Band 8.\n*   **Compilation & Deployment:** The process concluded with compiling the watch face project into a `.face` file, which is then renamed to `.bin` and deployed to the Mi Band 8 using a third-party companion Android application.\n\nThis project was a fascinating dive into the world of embedded device customization, working with specific (and often community-documented) file formats and tools."
+  },
+  {
+    "id": "circle-physics",
+    "title": "Algebraic 2D Physics Engine (Event-Based)",
+    "date": "2025-04-15T12:00:00.000Z",
+    "rank": 4,
+    "tags": [
+      "Physics Engine",
+      "Game Development",
+      "Python",
+      "Pygame",
+      "Algorithm",
+      "Mathematics",
+      "School Project",
+      "Informatica"
+    ],
+    "github": "https://github.com/TanteJossa/circle_physics",
+    "status": "Completed",
+    "team": [
+      "Joost Koch"
+    ],
+    "technologies": [
+      "Python",
+      "Pygame",
+      "NumPy",
+      "Physics Engine Design",
+      "Collision Detection",
+      "Event-Based Simulation"
+    ],
+    "description": "A final project for *Informatica (Computer Science) V6*, this is an **algebraic 2D physics engine** built in Python that processes collisions without discrete time steps. It focuses on event-based simulation to accurately handle interactions, primarily between circles and lines, eliminating issues like 'tunneling'.\n\n{{collision.png}}\n\n**Core Concepts & Challenges:**\n\n*   **Event-Based Simulation:** Instead of fixed time steps, the engine calculates the exact *Time of Impact (TOI)* for potential collisions.\n*   **Continuous Collision Detection (CCD):** Ensures that no collisions are missed, regardless of object speed.\n*   **Mathematical Precision:** Involved deriving and implementing precise formulas for TOI in scenarios such as ball-line, ball-endpoint, and ball-ball collisions.\n*   **Robustness:** Addressed floating-point inaccuracies and edge cases through careful implementation and checks like `math.isclose`.\n*   **Performance:** Balanced the computational cost of exact calculations with the need for a playable framerate in the demonstration game.\n\n**Implementation Details:**\n\n*   **Technology:** Python 3, with NumPy for efficient vector and matrix operations, and Pygame for visualization and user input.\n*   **Key Algorithms:**\n    *   TOI calculation for ball-line (segment and endpoints) and ball-ball interactions.\n    *   An event management loop (`run_tick`) that identifies the earliest collision, advances the simulation to that exact moment, and then processes the collision response.\n    *   Collision response includes reflection for ball-line and simplified impulse-based calculations for ball-ball collisions (assuming equal mass).\n*   **Game Application:** The engine's effectiveness and precision were demonstrated by integrating it into a playable \"One More Brick\"-style game, also developed with Pygame.\n\nThis project was a deep dive into the mathematics and programming challenges of creating a precise and stable physics simulation from first principles.",
+    "images": [
+      "collision.png",
+      "gameplay.png"
+    ]
+  },
+  {
+    "id": "pygame-physics-engine",
+    "title": "Early Pygame 2D Physics System",
+    "date": "2023-05-15T10:00:00.000Z",
+    "rank": 5,
+    "tags": [
+      "Physics Engine",
+      "Game Development",
+      "Python",
+      "Pygame",
+      "Beginner Project",
+      "OOP"
+    ],
+    "github": "https://github.com/TanteJossa/PyGamePhysicsEngine",
+    "status": "Archived",
+    "team": [
+      "Joost Koch"
+    ],
+    "technologies": [
+      "Python",
+      "Pygame",
+      "Object-Oriented Programming"
+    ],
+    "description": "One of my initial explorations into game physics, this project features a small Object-Oriented Programming (OOP) based 2D physics system developed using **Python and Pygame**. It served as a foundational learning experience in simulating basic physical interactions.\n\n**Key Features:**\n*   Simulates interactions between objects in a 2D space.\n*   Objects possess properties like position, velocity, mass, and can be affected by forces such as gravity (configurable) and air resistance (`calc_flucht`, `calc_luchtdruk`).\n*   Includes a basic GUI built with Pygame to display object states, forces, and allow for some user interaction. Users can select objects to view their properties.\n*   Dynamic interaction: Allows applying spring-like forces by clicking and dragging objects, with visual feedback through arrows.\n*   A simple solar system simulation mode demonstrates N-body gravitational interactions (`calc_gravity`).\n\nThe system updates object states based on calculated forces and velocities per discrete time step. Visualizations for force vectors and velocity vectors are drawn on screen.\n\n{{pygame_physics_gui.png}} *(Screenshot of the physics system GUI)*",
+    "images": [
+      "pygame_physics_gui.png"
+    ]
+  },
+  {
+    "id": "latex-converter",
+    "title": "Bidirectional LaTeX Equation Converter",
+    "date": "2023-08-20T14:00:00.000Z",
+    "rank": 6,
+    "tags": [
+      "Text Processing",
+      "LaTeX",
+      "JavaScript",
+      "Parser",
+      "Converter",
+      "Utility",
+      "NLP"
+    ],
+    "status": "Functional Prototype",
+    "team": [
+      "Joost Koch"
+    ],
+    "technologies": [
+      "JavaScript",
+      "Parsing",
+      "Tokenization",
+      "Regular Expressions"
+    ],
+    "description": "A JavaScript-based tool designed for converting mathematical equations between a simplified text format and standard LaTeX. The project focused on creating a robust tokenizer and parser to handle a variety of common mathematical expressions, functions, and structures.\n\n**Key Functionality:**\n\n*   **Text-to-LaTeX (`text-to-tex.js`):**\n    *   Parses a custom, simplified text input (e.g., `sin{x} + 2*y^3 / (a_1 + b)`).\n    *   Identifies numbers, variables, standard operators (+, -, *, /, ^, _), functions (sin, cos, log, sqrt, etc.), and grouped expressions (using `{}` or `[]` for units or tags).\n    *   Converts these tokens into valid LaTeX, correctly formatting fractions (as `\\dfrac`), operators (e.g., `*` as `\\cdot`), function notation, and handling sub/superscripts.\n    *   Supports units by wrapping them in `\\text{}` when enclosed in square brackets.\n\n*   **LaTeX-to-Text (`latex-to-text.js`):**\n    *   Tokenizes complex LaTeX strings. It identifies numbers (including scientific notation such as `1.23 \\cdot 10^{-4}`), variables, operators, and LaTeX commands (`\\dfrac`, `\\cdot`, `\\sin`, `\\text`, etc.).\n    *   Parses grouped content within `{}` (for arguments/grouping) and `[]` (often for optional arguments or units).\n    *   Converts recognized LaTeX structures back into a more readable, simplified text format.\n    *   Handles nested structures and various LaTeX mathematical constructs.\n    *   Features a `detectNumber` utility to robustly parse numerical values, including those with LaTeX-style exponents (`123{,}456 \\cdot 10^{3}`).\n    *   Normalizes number formats (e.g., scientific notation `1.23 \\cdot 10^{-4}` becomes `1.23E-4`, and `\\cdot` often becomes `*`).\n\nThis project was an in-depth exercise in lexical analysis and parsing. The `latex-to-text.js` component includes an internal testing suite to validate its parsing logic against diverse LaTeX inputs.\n\n*Example of a conversion (conceptual):*\n`\\text{Result: } \\dfrac{\\sin{x^2}}{y_1} + 5 \\cdot 10^{-3}`  <--->  `\"Result: \" sin{x^2}/y_1 + 5E-3`\n\n{{latex_conversion_example.png}} *(Placeholder: image showing an example UI or conversion process)*",
+    "images": [
+      "latex_conversion_example.png"
+    ]
+  },
+{
+  "id": "literary-analysis-ai",
+  "title": "Literary Research AI Automator",
+  "date": "2024-03-15T12:00:00.000Z",
+  "rank": 0,
+  "tags": [
+    "AI",
+    "Research Automation",
+    "Python",
+    "Google Gemini API",
+    "NLP",
+    "Academic Research",
+    "Literature Review",
+    "Paper Scraping",
+    "Paper Downloading"
+  ],
+  "github": "https://github.com/TanteJossa/literary-analysis-ai",
+  "status": "Functional Prototype",
+  "team": ["Joost Koch"],
+  "technologies": [
+    "Python",
+    "Google Gemini API (gemini-1.5-flash)",
+    "requests",
+    "BeautifulSoup4",
+    "python-dotenv",
+    "arxiv"
+  ],
+  "description": "This Python project automates key steps in the literary and academic research process. It leverages the **Google Gemini API** for advanced text analysis and keyword generation, systematically searches for academic papers from sources like Google Scholar and arXiv, and attempts to download them, streamlining the initial research workflow.\n\n**Core Functionality:**\n\n1.  **API & Configuration:** Securely configures Google Gemini API access via an `.env` file and loads research parameters (question, subject name, search limits) from **research_config.json**.\n2.  **AI Keyword Generation:** Uses the Gemini API (`gemini-1.5-flash`) to analyze a given research question and generate a categorized list of search keywords (high, medium, low probability).\n3.  **Paper Discovery:** The **paper_finder.py** module employs these keywords to search for relevant academic papers on platforms like Google Scholar and arXiv.\n4.  **Automated Downloading:** The **paper_downloader.py** module attempts to download the identified papers, trying common extensions like `.pdf` and `.doc`.\n5.  **Organized Output:** Saves downloaded papers and an **overview.json** (metadata of downloads) into a structured directory: `research_outputs/[subject_name]/`.\n\n**Key Files:**\n*   **main.py**: Orchestrates the entire process.\n*   **paper_finder.py**: Handles searching for papers.\n*   **paper_downloader.py**: Manages downloading papers.\n*   **research_config.json**: Stores user-defined research parameters.\n*   **.env**: For API key storage.\n\n**Envisioned Research Workflow Integration:**\nThis tool is designed to be part of a larger research workflow:\n\n1.  **Locate Sources:** Combine manual deep dives (e.g., using X.com, direct Gemini research with text extraction from HTML) with this automated tool for paper retrieval.\n2.  **Combine/Analyze Sources:** Use a powerful LLM (like Gemini 1.5 Pro) to synthesize information from all sources into a single, attributed document.\n3.  **Execute Research & Create Visualizations:** Define methodology, use Python (e.g., in a 'Roocode' environment with Gemini integration) for data analysis, graph generation (Matplotlib, Seaborn), and create textual summaries in JSON.\n4.  **Summarize Results:** Develop a final summary based on the synthesized document.\n5.  **Create TeX Report:** Produce a formal LaTeX report, managing citations with a `.bib` file and debugging in a 'Roocode' environment.\n    *   *Conceptual Latex Download Tool:* This could further streamline Step 5 by assisting with LaTeX distributions, templates, or fetching LaTeX sources of papers.\n\nThe project includes error handling for API configuration, file operations, and JSON parsing to ensure robustness. The **README.md** provides detailed setup and usage instructions.",
+  "images": [
+    "research_config_example.png"
+  ],
+  "pdfs": [
+    "pws-opiod-0.5-hours.pdf",
+    "neurotisicm-6hour-total.pdf",
+    "alchohol_retrograde_memory_facilitation.pdf"
+  ]
+}
+]

@@ -32,7 +32,7 @@
 
 
 
-                    div.ml-3.d-flex.flex-wrap#projects(ref="projects" @resize="shown_projects = shownProjects()")
+                    div.ml-3.d-flex.flex-row#projects(ref="projects" @resize="shown_projects = shownProjects()")
                         PostIt.ml-3.post-it(
                             v-for="(project, index) in shown_projects"
                             @mouseover="project_hover_index = index"
@@ -42,7 +42,7 @@
                             :style="{'z-index': project_hover_index == index ? '10 !important' : 0}"
                         )
                             h2 {{project.title}}
-                            p {{project.description}}
+                            div(v-html="processProjectContent(project.description, project.id)")
                 template(#div2 )
                     div.w-100.h-100(style="position: relative; min-height: calc((100vh - 250px) / 2)")
 
@@ -232,28 +232,109 @@
                                 @click="openProject(project.id)"
                             )
                                 v-card-title {{project.title}}
-                                v-card-text 
-                                    p {{project.description}}
+                                v-card-text
+                                    v-row(no-gutters)
+                                        v-col(v-if="project.images && project.images.length > 0 && project.images[0]", cols="auto", style="min-width: 92px;")
+                                            img(
+                                                :src="getProjectImageUrl(project.id, project.images[0])"
+                                                :alt="project.title + ' thumbnail'"
+                                                style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; margin-right: 12px;"
+                                            )
+                                        v-col
+                                            div(style="font-size: 0.9em;") {{ getTruncatedDescription(project.description) }}
                     div.h-100(
                         v-if="route.type == 'projects' && route.id"
                         :set="project = getProjectFromId(route.id)"
+                        style="overflow-y: auto;"
                     )
-                        div.d-flex.flex-row
-                            h1.text-grey \#{{project.rank + ' '}} 
-                            h1 {{ project.title }}
-                            v-icon.ml-auto(
-                                v-if="project.github && project.github.length > 0"
-                                icon="mdi-github"
-                                size="xx-large"
-                                @click="open(project.github)"
-                            )
-                            p {{ getPrettyDate(project.date) }}
+                        div.d-flex.flex-row.align-center.mb-2
+                            h2.text-grey.mr-2 \#{{project.rank}}
+                            h2 {{ project.title }}
+                            v-spacer
+                            v-btn(v-if="project.url" :href="project.url" target="_blank" icon variant="text" density="compact")
+                                v-icon(icon="mdi-open-in-new")
+                            v-btn(v-if="project.github" :href="project.github" target="_blank" icon variant="text" density="compact")
+                                v-icon(icon="mdi-github")
                         
-                        p {{ project.description }}
+                        p.text-caption.text-grey-darken-1 {{ getPrettyDate(project.date) }} | Status: {{ project.status }}
 
+                        div.mt-2(v-if="project.team && project.team.length > 0")
+                            strong Team:
+                            span {{ project.team.join(', ') }}
+                        
+                        div.mt-2(v-if="project.tags && project.tags.length > 0")
+                            strong Tags:
+                            v-chip.ma-1(v-for="tag in project.tags" :key="tag" small density="compact") {{ tag }}
+                        
+                        div.mt-2(v-if="project.technologies && project.technologies.length > 0")
+                            strong Technologies:
+                            v-chip.ma-1(v-for="tech in project.technologies" :key="tech" small density="compact") {{ tech }}
 
+                        div.mt-3(v-html="processProjectContent(project.description, project.id)")
+                        
+                        div.mt-3(v-if="project.long_description" v-html="processProjectContent(project.long_description, project.id)")
 
-    
+                        div.mt-4(v-if="project.images && project.images.length > 0")
+                            h3.mb-2 Images:
+                            div.d-flex.flex-wrap.ga-2
+                                img.ma-1(
+                                    v-for="imageName in project.images"
+                                    :key="imageName"
+                                    :src="getProjectImageUrl(project.id, imageName)"
+                                    :alt="project.title + ' - ' + imageName"
+                                    style="max-width: 200px; max-height: 150px; height: auto; border-radius: 4px; object-fit: cover; border: 1px solid #eee; cursor: pointer;"
+                                    @click="openImageDialog(getProjectImageUrl(project.id, imageName), project.title + ' - ' + imageName)"
+                                )
+                        
+                        div.mt-4(v-if="project.pdfs && project.pdfs.length > 0")
+                            h3.mb-2 Associated Files:
+                            div.d-flex.flex-wrap.ga-2
+                                v-card.pa-2.ma-1(
+                                    v-for="pdfName in project.pdfs"
+                                    :key="pdfName"
+                                    link
+                                    :href="getProjectPdfUrl(project.id, pdfName)"
+                                    target="_blank"
+                                    style="min-width: 150px; text-decoration: none;"
+                                    hover
+                                )
+                                    v-row(align="center" no-gutters)
+                                        v-col(cols="auto")
+                                            v-icon.mr-2(icon="mdi-file-pdf-box" size="large" color="red-darken-2")
+                                        v-col
+                                            div(style="font-size: 0.9em; word-break: break-all;") {{ pdfName }}
+
+    v-dialog(
+        v-model="imageDialogVisible"
+        transition="dialog-bottom-transition"
+        overlay-opacity="0.7"
+        max-width="90vw"
+        width="auto"
+    )
+        v-card(style="display: flex; flex-direction: column; max-height: 90vh;")
+            v-toolbar(
+                dark
+                color="primary"
+                density="compact"
+            )
+                v-toolbar-title {{ selectedImageAlt }}
+                v-spacer
+                v-btn(
+                    icon
+                    dark
+                    @click="imageDialogVisible = false"
+                )
+                    v-icon mdi-close
+            v-card-text.d-flex.justify-center.align-center.flex-grow-1(
+                style="overflow: auto; background-color: #212121;"
+            )
+                v-img(
+                    :src="selectedImageUrl"
+                    :alt="selectedImageAlt"
+                    contain
+                    style="max-height: 100%; max-width: 100%;"
+                )
+
 </template>
 
 <script>
@@ -264,8 +345,10 @@ import PostIt from '@/components/PostIt.vue'; // Adjust path as needed
 import MulticoloredText from '@/components/MulticoloredText.vue';
 import HomeGrid from '@/components/HomeGrid.vue';
 import { v4 as uuidv4 } from 'uuid';
-import { getUniqueIntegers, extractDateFromFilename } from '@/helpers'
+import { getUniqueIntegers, extractDateFromFilename } from '../helpers';
 import PolaroidPhoto from '@/components/PolaroidPhoto.vue';
+import projectsData from '../assets/projects.json';
+import { marked } from 'marked';
 
 
 export default {
@@ -287,61 +370,12 @@ export default {
     data() {
         return {
 
-            projects: [
-                {
-                    id: "1",
-                    title: "PWS",
-                    description: `My profielwerkstuk. A research project for school, where me and my friend made a system to automically scan, sort and grade student answers for a high school test.`,
-                    rank: 1,
-                    date: new Date(),
-                    github: "https://github.com/TanteJossa/PWS-latex/blob/main/PWS-NakijkenMetAi-JoostKoch-JonathanWijker.pdf",
-                },
-                {
-                    id: "2",
-                    title: "Site",
-                    description: `This VueJs 3 website. The background and more.`,
-                    rank: 2,
-                    date: new Date(),
-                    github: "https://github.com/TanteJossa/joost-koch-site",
-                },
-                {
-                    id: "3",
-                    title: "MiBand8 Custom Watchface",
-                    description: `mi ;) exploration in creating watch faces for the mi band 8`,
-                    rank: 3,
-                    date: new Date(),
-                    github: "https://github.com/TanteJossa/miband8-watchfaces",
-                },
-                {
-                    id: "4",
-                    title: "CirclePhysics",
-                    description: `Exploration in continous rigid body calculation in python. Display made with pygame.`,
-                    rank: 4,
-                    date: new Date(),
-                    github: "https://github.com/TanteJossa/circle_physics",
-                },
-                {
-                    id: "5",
-                    title: "PygamePhysicsSystem",
-                    description: `One of my first projects, a small oop physics system in python pygame`,
-                    rank: 5,
-                    date: new Date(),
-                    github: "https://github.com/TanteJossa/PyGamePhysicsEngine",
-                },
-                {
-                    id: "6",
-                    title: "PWS-scan",
-                    description: `Research in using AI in scanning tests. Custom papers. Grading API server`,
-                    rank: 1.1,
-                    date: new Date(),
-                    github: "https://github.com/TanteJossa/PWS-inscannen",
-                },
-            ],
             is_moving_wood: false,
             project_hover_index: -1,
             shown_projects: [],
             route_history: [],
             
+            projects: [], // Initialize projects as an empty array
 
             project_search: "",
             project_sort: "Rank",
@@ -357,8 +391,12 @@ export default {
             media_is_sorted: false,
             series: [],
             movies: [],
-            loading_media: false
+            loading_media: false,
 
+
+            imageDialogVisible: false,
+            selectedImageUrl: null,
+            selectedImageAlt: '',
 
         }
     },
@@ -376,7 +414,7 @@ export default {
             return this.route_history.map(e => {
                 const route_data = this.getRouteData(e)
                 var rich_route_data = {}
-                rich_route_data.is_item_page = ![undefined, ''].includes(route_data.id) 
+                rich_route_data.is_item_page = ![undefined, ''].includes(route_data.id)
                 rich_route_data.type = route_data.type
                 rich_route_data.id = route_data.id
 
@@ -389,6 +427,9 @@ export default {
             })
         },
         sorted_projects(){
+            if (!this.projects || this.projects.length === 0) {
+                return [];
+            }
             const sort_method = {
                 "Date": (a,b) => a.date.getTime() - b.date.getTime(),
                 "Title": (a,b) => a.title > b.title ? 1 : -1,
@@ -416,14 +457,15 @@ export default {
 
         },
         shownProjects(){
-            const projects_container = this.$refs.projects
-            if (projects_container){
-                const box = projects_container.getBoundingClientRect()
-                
-                return this.projects.slice(0, Math.floor(box.width / 220) * (this.$vuetify.display.lgAndUp ? 2 : 1))
+            if (!this.projects || this.projects.length === 0) {
+                return [];
             }
-
-            return this.projects
+            const projects_container = this.$refs.projects;
+            if (!projects_container) {
+                return [];
+            }
+            const box = projects_container.getBoundingClientRect();
+            return this.projects.slice(0, Math.floor(box.width / 220) * (this.$vuetify.display.lgAndUp ? 2 : 1));
         },
         overlayGoBack(){
             this.overlay_type = {
@@ -453,7 +495,7 @@ export default {
             var route_type_name = ''
             if (type == 'projects') {
                 route_type_name = 'projects';
-            } 
+            }
 
             return '/' + route_type_name + (id ? '/' + id : '')
         },
@@ -479,9 +521,18 @@ export default {
             this.route_history.push(this.routeDataToUrl('projects', id))
         },
         getProjectFromId(id){
+            if (!this.projects || this.projects.length === 0) {
+                return {};
+            }
             return this.projects.find(e => e.id == id) || {}
         },
 
+
+        openImageDialog(imageUrl, altText) {
+            this.selectedImageUrl = imageUrl;
+            this.selectedImageAlt = altText;
+            this.imageDialogVisible = true;
+        },
 
         getPrettyDate(date){
             const options = {
@@ -492,8 +543,83 @@ export default {
 
             return date.toLocaleDateString('en-US', options);
         },
+        getProjectImageUrl(projectId, imageFilename) {
+            if (!projectId || !imageFilename) {
+                // console.warn('Missing projectId or imageFilename for getProjectImageUrl');
+                return ''; // Return empty or a placeholder image URL
+            }
+            try {
+                // Path relative from src/views/HomeView.vue to src/assets/projects/
+                return new URL(`../assets/projects/${projectId}/${imageFilename}`, import.meta.url).href;
+            } catch (e) {
+                console.error(`Error creating image URL for project '${projectId}', image '${imageFilename}':`, e);
+                return ''; // Return empty or a placeholder image URL
+            }
+        },
+        getProjectPdfUrl(projectId, pdfFilename) {
+            if (!projectId || !pdfFilename) {
+                return '';
+            }
+            try {
+                return new URL(`../assets/projects/${projectId}/${pdfFilename}`, import.meta.url).href;
+            } catch (e) {
+                console.error(`Error creating PDF URL for project '${projectId}', PDF '${pdfFilename}':`, e);
+                return '';
+            }
+        },
+        getTruncatedDescription(description, maxLength = 120) {
+            if (!description || typeof description !== 'string') return '';
+            // Basic stripping of markdown for length calculation and display
+            let plainText = description
+                .replace(/\{\{.*?\}\}/g, '') // Remove image placeholders
+                .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Replace links with their text
+                .replace(/[*_`~#\-+\.\!]/g, ''); // Remove other markdown chars, list markers
+
+            plainText = plainText.replace(/\s+/g, ' ').trim(); // Normalize whitespace
+
+            if (plainText.length <= maxLength) {
+                return plainText;
+            }
+            let truncated = plainText.substring(0, maxLength);
+            // Try to end on a word
+            const lastSpace = truncated.lastIndexOf(' ');
+            if (lastSpace > 0) {
+                truncated = truncated.substring(0, lastSpace);
+            }
+            return truncated + '...';
+        },
         open(url){
             window.open(url, '_blank')
+        },
+        processProjectContent(content, projectId) {
+            if (!content || typeof content !== 'string') return '';
+            
+            let htmlContent = '';
+            try {
+                // Configure marked to add classes or use a renderer if needed for more complex styling
+                htmlContent = marked(content);
+            } catch (e) {
+                console.error('Error parsing markdown:', e);
+                htmlContent = `<p>Error rendering content.</p>`; // Fallback content
+            }
+
+            // Replace {{image_name.ext}} placeholders
+            return htmlContent.replace(/\{\{(.*?)\}\}/g, (match, imageNameWithExt) => {
+                const imageName = imageNameWithExt.trim();
+                if (!imageName) return match;
+
+                try {
+                    const imageUrl = this.getProjectImageUrl(projectId, imageName);
+                    if (!imageUrl) return `<!-- Image '${imageName}' could not be resolved -->`;
+                    
+                    const altText = imageName.substring(0, imageName.lastIndexOf('.')).replace(/[_-]/g, ' ');
+                    return `<img src="${imageUrl}" alt="${altText}" style="max-width: 100%; height: auto; display: block; margin: 10px auto; border-radius: 8px; border: 1px solid #ddd;">`;
+                } catch (e) {
+                    // This catch might be redundant if getProjectImageUrl handles its own errors
+                    console.error(`Error processing image placeholder for project ${projectId}: ${imageName}`, e);
+                    return `<!-- Error processing image '${imageName}' -->`;
+                }
+            });
         },
         async loadRandomImages(){
             const ids = getUniqueIntegers(5, 1, 62);
@@ -532,7 +658,7 @@ export default {
                             top: Math.random() * 20,
                             rotation: (40*Math.random() - 20),
                             z_index: Math.round(Math.random() * 10).toString()
-                        })  
+                        })
                     } catch (error) {
                         console.error(`Error loading image ${filename}:`, error);
                         return null;
@@ -593,11 +719,17 @@ export default {
                     this.$router.push('/')
                 }
                 console.log(this.route_history)
-            }, 
+            },
             deep: true
         },
     },
     async mounted() {
+        // projectsData is now directly imported and mapped
+        this.projects = projectsData.map(p => ({
+            ...p,
+            date: p.date ? new Date(p.date) : null
+        }));
+
         this.PowerGlitch.glitch('.glitch-text', {
             glitchTimeSpan: {
                 "start": 0,
@@ -626,17 +758,19 @@ export default {
         }
 
 
-        const projects_container = this.$refs.projects
-        if (projects_container){
+        const projects_container = this.$refs.projects;
+        if (projects_container) {
             const observer = new ResizeObserver(() => {
-                this.shown_projects = this.shownProjects()
+                this.shown_projects = this.shownProjects();
             });
             observer.observe(projects_container);
         }
-        this.shown_projects = this.shownProjects()
         
-        await Promise.all([this.loadRandomImages(), this.loadMedia()])
+        // Fetch all data first
+        await Promise.all([/*this.fetchProjects() removed*/ this.loadRandomImages(), this.loadMedia()]);
 
+        // Now that projects are loaded, update shown_projects
+        this.shown_projects = this.shownProjects();
 
     },
 };
@@ -682,8 +816,36 @@ export default {
     z-index: 3
 }
 .post-it {
-    width: clamp(100px, 50%, 200px);
-    aspect-ratio: 1 / 1; 
-    font-size: clamp(0.8rem, 0.5vw, 2rem)
+    width: clamp(150px, 50%, 180px); /* Adjusted min width for better layout */
+    height: 200px; /* Fixed height */
+    font-size: clamp(0.8rem, 0.5vw, 2rem);
+    padding: 10px; /* Added padding for content */
+    overflow: hidden; /* Hide overflowing content */
+    display: flex; /* Using flex to help with content alignment */
+    flex-direction: column; /* Stack title and description vertically */
+}
+
+.post-it h2 {
+    margin-bottom: 5px; /* Space between title and description */
+    flex-shrink: 0; /* Prevent title from shrinking */
+}
+
+.post-it div[v-html] { /* Target the div rendering markdown */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 6; /* Adjust number of lines visible */
+    -webkit-box-orient: vertical;
+    flex-grow: 1; /* Allow description to take available space */
+    line-height: 1.2em; /* Adjust line height for better fit */
+    max-height: calc(1.2em * 6); /* Fallback for non-webkit browsers, matches line-clamp */
+}
+
+:deep(ol) {
+  margin-left: 20px !important;
+}
+
+:deep(ul) {
+  margin-left: 20px !important;
 }
 </style>

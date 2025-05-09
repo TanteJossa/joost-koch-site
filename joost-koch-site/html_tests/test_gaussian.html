@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive Gaussian Contour</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        .slider-container {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="400" height="400"></canvas>
+    <div id="sliders"></div>
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const sliderDiv = document.getElementById('sliders');
+
+        // Define Gaussian Function
+        function gaussian3D(x, y, z, center, amplitude, sigma) {
+            const [x0, y0, z0] = center;
+            const [sx, sy, sz] = sigma;
+            const exponent = -((x - x0) ** 2 / (2 * sx ** 2) +
+                (y - y0) ** 2 / (2 * sy ** 2) +
+                (z - z0) ** 2 / (2 * sz ** 2));
+            return amplitude * Math.exp(exponent);
+        }
+
+        function sumOfGaussians(x, y, z, gaussians) {
+            let total = 0;
+            for (const g of gaussians) {
+                const [center, amplitude, sigma] = g;
+                total += gaussian3D(x, y, z, center, amplitude, sigma);
+            }
+            return total;
+        }
+
+        // Define Gaussian Parameters -  Initialize with current values
+        const gaussiansData = [
+            {center: [0, 0, 0], amplitude: 5, sigma: [1, 1, 1]},
+            {center: [2, 2, 1], amplitude: 3, sigma: [0.8, 0.8, 0.8]},
+            {center: [-2, -2, -1], amplitude: 2, sigma: [0.7, 0.7, 0.7]},
+        ];
+
+        const zSlice = 0; // Z-plane
+
+        // Define the drawing boundaries
+        const xMin = -5;
+        const xMax = 5;
+        const yMin = -5;
+        const yMax = 5;
+
+
+        function createSlider(gaussianIndex, axis, initialValue) {
+            const container = document.createElement('div');
+            container.classList.add('slider-container');
+            const label = document.createElement('label');
+            label.textContent = `Gaussian ${gaussianIndex + 1} ${axis}: `;
+            const slider = document.createElement('input');
+            slider.type = 'range';
+            slider.min = -5;
+            slider.max = 5;
+            slider.step = 0.1;
+            slider.value = initialValue;
+
+            const valueDisplay = document.createElement("span")
+            valueDisplay.innerText = initialValue;
+
+            slider.addEventListener('input', () => {
+                gaussiansData[gaussianIndex].center[axis === 'x' ? 0 : axis === 'y' ? 1 : 2] = parseFloat(slider.value);
+                valueDisplay.innerText = parseFloat(slider.value).toFixed(1);
+                drawContour();
+            });
+
+            container.appendChild(label);
+            container.appendChild(slider);
+            container.appendChild(valueDisplay);
+            sliderDiv.appendChild(container);
+            return slider;
+        }
+
+
+        // Create sliders for each gaussian
+        for (let i = 0; i < gaussiansData.length; i++) {
+            createSlider(i, 'x', gaussiansData[i].center[0]);
+            createSlider(i, 'y', gaussiansData[i].center[1]);
+            createSlider(i, 'z', gaussiansData[i].center[2]);
+        }
+
+        function drawContour() {
+            ctx.clearRect(0,0, width, height); // Clear the canvas every draw
+            const resolution = 100;
+            const levels = 20;
+            let minZ = Infinity;
+            let maxZ = -Infinity;
+            const zValues = new Array(resolution);
+
+            for (let i = 0; i < resolution; i++) {
+              zValues[i] = new Array(resolution)
+            }
+
+            // Get z-value for each point
+            for (let row = 0; row < resolution; row++) {
+              for (let col = 0; col < resolution; col++) {
+                const x = xMin + (xMax - xMin) * col / (resolution - 1);
+                const y = yMin + (yMax - yMin) * row / (resolution - 1);
+                const z = sumOfGaussians(x, y, zSlice, gaussiansData.map(g => [g.center, g.amplitude, g.sigma]));
+
+                zValues[row][col] = z;
+
+                minZ = Math.min(minZ, z);
+                maxZ = Math.max(maxZ, z);
+              }
+            }
+
+            // Calculate contour levels
+            const levelValues = [];
+            for (let i = 0; i < levels; i++) {
+                levelValues.push(minZ + (maxZ - minZ) * i / (levels - 1));
+            }
+
+            // Create a canvas image
+            let imgData = ctx.createImageData(width, height);
+            let data = imgData.data;
+
+            // Iterate over each pixel of the image and find contour levels
+            for (let px_y = 0; px_y < height; px_y++) {
+                for (let px_x = 0; px_x < width; px_x++) {
+                    const x = xMin + (xMax - xMin) * px_x / (width - 1);
+                    const y = yMin + (yMax - yMin) * px_y / (height - 1);
+
+                    const i = Math.round((y - yMin) / (yMax - yMin) * (resolution-1))
+                    const j = Math.round((x - xMin) / (xMax - xMin) * (resolution-1))
+                    if (i < 0 || i >= resolution || j < 0 || j >= resolution) continue;
+                    const z = zValues[i][j];
+                    // Determine the contour level color
+
+                    let colorValue = 0; // Start with black
+
+                    for (let levelIndex = 0; levelIndex < levels-1; levelIndex++){
+                      const currentLevel = levelValues[levelIndex];
+                      const nextLevel = levelValues[levelIndex+1];
+                      if (z >= currentLevel && z < nextLevel){
+                          const value = (levelIndex/ (levels-1));
+                          const hue = 240*value; // Blue
+                          const sat = 100;
+                          const bright = 100;
+                          const [red, green, blue] = hsbToRgb(hue, sat, bright);
+
+                          colorValue = (red << 16) + (green << 8) + blue;
+                      }
+                    }
+
+                    // Set pixel color based on level
+                    let pixelIndex = (px_y * width + px_x) * 4;
+                    data[pixelIndex] = (colorValue >> 16) & 0xFF;
+                    data[pixelIndex + 1] = (colorValue >> 8) & 0xFF;
+                    data[pixelIndex + 2] = colorValue & 0xFF;
+                    data[pixelIndex + 3] = 255; // Alpha channel
+                }
+            }
+
+            // Update image data
+            ctx.putImageData(imgData, 0, 0);
+        }
+
+        function hsbToRgb(h, s, b){
+            h = h/360
+            s = s/100
+            b = b/100
+
+            const i = Math.floor(h * 6);
+            const f = h * 6 - i;
+            const p = b * (1 - s);
+            const q = b * (1 - f * s);
+            const t = b * (1 - (1 - f) * s);
+
+            let r, g, bl;
+
+            switch(i % 6){
+                case 0: r = b, g = t, bl = p; break;
+                case 1: r = q, g = b, bl = p; break;
+                case 2: r = p, g = b, bl = t; break;
+                case 3: r = p, g = q, bl = b; break;
+                case 4: r = t, g = p, bl = b; break;
+                case 5: r = b, g = p, bl = q; break;
+            }
+
+            return [Math.round(r*255), Math.round(g*255), Math.round(bl*255)];
+        }
+
+        drawContour();
+
+    </script>
+</body>
+</html>

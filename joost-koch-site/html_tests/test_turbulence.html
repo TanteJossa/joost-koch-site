@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Paper Crumble Effect</title>
+<style>
+  body { margin: 0; overflow: hidden; background-color: #f0f0f0; }
+  #paper-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 400px;
+    background-color: white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+  #voronoi-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .voronoi-cell {
+    fill: #eee; /* Light gray for the paper surface */
+    stroke: #ccc; /* Subtle fold lines */
+    stroke-width: 0.5;
+    filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.1)); /* Basic shadow */
+  }
+</style>
+</head>
+<body>
+
+<div id="paper-container">
+  <svg id="voronoi-canvas"></svg>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+  const container = document.getElementById('paper-container');
+  const canvas = d3.select("#voronoi-canvas");
+  const width = container.offsetWidth;
+  const height = container.offsetHeight;
+
+  canvas.attr("width", width).attr("height", height);
+
+  // Number of Voronoi cells (more cells = more detailed crumples)
+  const numCells = 100;
+
+  // Generate random points for Voronoi sites
+  const points = d3.range(numCells).map(function() {
+    return [Math.random() * width, Math.random() * height];
+  });
+
+  // Create Delaunay triangulation
+  const delaunay = d3.Delaunay.from(points);
+
+  // Create Voronoi diagram
+  const voronoi = delaunay.voronoi([0, 0, width, height]);
+
+  // Render Voronoi cells as SVG paths
+  canvas.selectAll(".voronoi-cell")
+    .data(voronoi.cellPolygons()) // Use cellPolygons() to get the polygons
+    .enter().append("path")
+    .attr("class", "voronoi-cell")
+    .attr("d", function(d) { return d ? "M" + d.join("L") + "Z" : null; });
+    
+  // Function to add more realistic shadows (can be computationally intensive)
+  function addRealisticShadows() {
+    canvas.selectAll(".voronoi-cell").each(function(d) {
+      if (!d) return;
+      const centroid = d3.polygonCentroid(d);
+      const normalVector = calculateNormalVector(d); // Function to calculate normal vector
+      const lightSource = [width / 2, height / 2, 500]; // Example light source (x, y, z)
+
+      const dotProduct = normalVector[0] * (lightSource[0] - centroid[0]) +
+                         normalVector[1] * (lightSource[1] - centroid[1]) +
+                         normalVector[2] * (lightSource[2] - centroid[2]);
+
+      // Adjust fill color based on the angle to the light source
+      const baseColor = d3.color("#eee");
+      const shadowFactor = Math.max(-0.5, Math.min(0.5, dotProduct / 50000)); // Adjust divisor for intensity
+      const newColor = d3.color(baseColor.brighter(shadowFactor));
+      d3.select(this).style("fill", newColor.toString());
+    });
+  }
+
+  // Simple function to calculate a basic normal vector (approximation)
+  function calculateNormalVector(polygon) {
+    if (polygon.length < 3) return [0, 0, 1]; // Default normal for degenerate polygons
+
+    const a = polygon[0];
+    const b = polygon[1];
+    const c = polygon[2];
+
+    const ab = [b[0] - a[0], b[1] - a[1], 0];
+    const ac = [c[0] - a[0], c[1] - a[1], 0];
+
+    const normalX = ab[1] * ac[2] - ab[2] * ac[1];
+    const normalY = ab[2] * ac[0] - ab[0] * ac[2];
+    const normalZ = ab[0] * ac[1] - ab[1] * ac[0];
+
+    // Normalize the vector
+    const length = Math.sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ);
+    return [normalX / length, normalY / length, normalZ / length];
+  }
+
+  // Call the function to add more realistic shadows (optional - might be slow)
+  // addRealisticShadows();
+
+</script>
+
+</body>
+</html>
