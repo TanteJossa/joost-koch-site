@@ -42,7 +42,7 @@
                             :style="{'z-index': project_hover_index == index ? '10 !important' : 0}"
                         )
                             h2 {{project.title}}
-                            div(v-html="processProjectContent(project.description, project.id)")
+                            div.truncate-multi-line(v-html="processProjectContent(project.description, project.id)")
                 template(#div2 )
                     div.w-100.h-100(style="position: relative; min-height: calc((100vh - 250px) / 2)")
 
@@ -53,7 +53,7 @@
                                 v-for="(image, index) in shown_images"
                                 @mouseover="image_hover_index = index"
                                 @mouseleave="image_hover_index = -1"
-                                :style="{'transform': 'rotate('+image.rotation+'deg)', 'max-height': 'calc('+(100 - image.top ) + '%' + (index < 1 ? ' - 30px)' : ')'), top:  'calc('+( image.top ) + '%' + (index < 1 ? ' +  40px)' : ')'), position: 'absolute', left: index * (80) / shown_images.length  + '%', 'z-index': image_hover_index == index ? '10 !important' : image.z_index}"
+                                :style="{'transform': 'rotate('+image.rotation+'deg)', 'max-width': '250px', 'max-height': 'calc('+(100 - image.top ) + '%' + (index < 1 ? ' - 30px)' : ')'), top:  'calc('+( image.top ) + '%' + (index < 1 ? ' +  40px)' : ')'), position: 'absolute', left: index * (70) / shown_images.length  + '%', 'z-index': image_hover_index == index ? '10 !important' : image.z_index}"
                                 :image="image.imageUrl"
                                 :date="image.date ? image.date : undefined"
                             )
@@ -68,8 +68,8 @@
                                     @click="loadRandomImages()"
                                 )
                 template(#div3)
-                    div.ml-6.mt-9(
-                        :style="{'height': 'calc(100% - 50px)','width':'calc(100% - 50px)','transform': 'rotate('+(media_text_rotation)+'deg)', 'display': 'inline-block'}"
+                    div.pl-6.w-100(
+                        :style="{'transform': 'rotate('+(media_text_rotation)+'deg)', 'display': 'inline-block'}"
 
                     )
                         div(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
@@ -97,7 +97,7 @@
                             :disabled="loading_media"
                         
                         )
-                        div.w-100(style="height: calc(100% - 280px); width: calc(100% - 40px); overflow-y: scroll; color: white; font-family: 'CreamyChalk'")
+                        div.w-100(style="overflow-y: scroll; color: white; font-family: 'CreamyChalk'")
                             table.w-100(v-if="media_type == 'movies' && movies.length > 0")
                                 thead
                                     tr
@@ -127,34 +127,35 @@
                              
                             )
                 template(#div4)
-                    div.ml-3(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
-                        MulticoloredText(
-                            text="Links"
-                        )
-                    div.ma-2(style="height: 80px; overflow-y: hidden; border-radius: 13px")
-                        iframe(
-                            style="border-radius:12px", 
-                            src="https://open.spotify.com/embed/track/7qGoMOzR9pJ1bPl4bFmTN7?utm_source=generator", 
-                            width="100%", height="120px", 
-                            frameborder="0", 
-                            allowfullscreen, 
-                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
-                            loading="lazy"
-                        )         
-   
-                    div.ma-2.mb-0(style="overflow-y: hidden; border-radius: 13px")
-                        iframe(
-                            style="border-radius:12px", 
-                            src="https://open.spotify.com/embed/playlist/5C43gmwC8gamonutCtNTn5?utm_source=generator", 
-                            width="100%", 
-                            height="152", 
-                            frameborder="0", 
-                            allowfullscreen, 
-                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
-                            loading="lazy"
-                        )
+                    div.pl-6
+                        div.ml-3(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
+                            MulticoloredText(
+                                text="Links"
+                            )
+                        //- div.ma-2(style="height: 80px; overflow-y: hidden; border-radius: 13px")
+                            iframe(
+                                style="border-radius:12px", 
+                                src="https://open.spotify.com/embed/track/7qGoMOzR9pJ1bPl4bFmTN7?utm_source=generator", 
+                                width="100%", height="120px", 
+                                frameborder="0", 
+                                allowfullscreen, 
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
+                                loading="lazy"
+                            )         
+      
+                        div.ma-2.mb-0(style="overflow-y: hidden; border-radius: 13px")
+                            iframe(
+                                style="border-radius:12px", 
+                                src="https://open.spotify.com/embed/playlist/5C43gmwC8gamonutCtNTn5?utm_source=generator", 
+                                width="100%", 
+                                height="152", 
+                                frameborder="0", 
+                                allowfullscreen, 
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
+                                loading="lazy"
+                            )
 
-                    div.mb-3.ml-3.d-flex.flex-wrap
+                        div.mb-3.ml-3.d-flex.flex-wrap
                         v-icon.hover-shadow(
                             style="font-size: 50px"
                             icon="mdi-github"
@@ -848,13 +849,25 @@ export default {
     z-index: 3
 }
 .post-it {
-    width: clamp(150px, 50%, 180px); /* Adjusted min width for better layout */
+
     height: 200px; /* Fixed height */
+    width: 200px;
     font-size: clamp(0.8rem, 0.5vw, 2rem);
     padding: 10px; /* Added padding for content */
     overflow: hidden; /* Hide overflowing content */
     display: flex; /* Using flex to help with content alignment */
     flex-direction: column; /* Stack title and description vertically */
+    
+
+}
+.truncate-multi-line {
+    overflow: hidden;         
+    text-overflow: ellipsis;  
+    display: -webkit-box;     
+    line-clamp: 3;
+    -webkit-line-clamp: 3;    
+    -webkit-box-orient: vertical;
+
 }
 
 .post-it h2 {
@@ -866,6 +879,7 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
+    line-clamp: 6;
     -webkit-line-clamp: 6; /* Adjust number of lines visible */
     -webkit-box-orient: vertical;
     flex-grow: 1; /* Allow description to take available space */

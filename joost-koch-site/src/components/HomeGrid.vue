@@ -15,7 +15,7 @@
     .div5
         slot(name="div4")
             p div4
-    .div6
+    //- .div6
         slot(name="div5")
             p div5
 </template>
@@ -63,22 +63,24 @@ export default {
 
 <style scoped>
 .parent {
-  gap: 0; /* Use gap for consistency */
-  height: 100%; /* Make sure parent takes up height if needed */
+  gap: 0; 
+  max-height: 100vh; 
+  max-width: 100vw;
+  /* overflow: hidden; */
 }
 
-.md-up {
+.md-up { 
   display: grid;
   grid-template-columns: 1fr min(700px, 100vw) 1fr;
   grid-template-rows: 1fr 0.5fr 1fr;
 }
 
-.md-up .div1 { grid-area: 1 / 1 / 3 / 2; }
-.md-up .div2 { grid-area: 2 / 2 / 3 / 3; }
-.md-up .div3 { grid-area: 1 / 2 / 2 / 4; }
-.md-up .div4 { grid-area: 2 / 3 / 4 / 4; }
-.md-up .div5 { grid-area: 3 / 1 / 4 / 2; }
-.md-up .div6 { grid-area: 3 / 2 / 4 / 3; }
+.md-up .div1 { grid-area: 1 / 1 / 1 / 3; }
+.md-up .div2 { grid-area: 2 / 2 / 2 / 2; }
+.md-up .div3 { grid-area: 3 / 1 / 3 / 3; }
+.md-up .div4 { grid-area: 1 / 3 / 3 / 3; }
+.md-up .div5 { grid-area: 3 / 3 / 3 / 3; }
+/* .md-up .div6 { grid-area: 3 / 2 / 4 / 3; } */
 
 
 </style>

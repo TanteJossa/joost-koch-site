@@ -1,9 +1,9 @@
 <template lang="pug">
 
 div.polaroid-container.hover-shadow( )
-    div.polaroid.h-100(style="max-height: 100%" @mouseover="isHovered = true" @mouseleave="isHovered =false")
-        div.image-container.h-100
-            img(:src="image" alt="Polaroid Photo" height="100%")
+    div.polaroid(@mouseover="isHovered = true" @mouseleave="isHovered =false")
+        div.image-container
+            img.h-100.w-100(:src="image" cover style="object-fit: cover; aspect-ratio: 5/4" alt="Polaroid Photo")
             div(:class="show_glint ? 'glint' : ''")
         div.date {{ formattedDate }}
 </template>
@@ -57,19 +57,20 @@ export default {
     justify-content: center;
     align-items: center;
     margin: 10px;
-    height: inherit
+
 }
 
 .polaroid {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    height: min-content;
+    /* max-height: calc(100% - 50px); */
     position: relative;
-    width: 300px;
     padding: 10px;
     background: white;
     border: 1px solid #ddd;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
     transition: transform 0.3s ease;
-    width: fit-content;
 }
 
 .polaroid:hover {
