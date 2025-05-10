@@ -506,8 +506,40 @@ export default {
 
             }
         },
-        goBack(){
-            this.route_history.splice(this.route_history.length - 1, 1)
+        goBack() {
+            if (this.route_history.length === 0) {
+                return; // Nothing to go back to
+            }
+
+            const currentRoutePath = this.route_history[this.route_history.length - 1];
+            const routeData = this.getRouteData(currentRoutePath);
+
+            // Check if the current view is a single project detail page
+            if (routeData && routeData.type === 'projects' && routeData.id) {
+                const projectBrowserUrl = this.routeDataToUrl('projects');
+                
+                // Remove the current project detail page from history
+                this.route_history.pop();
+
+                // Check if the project browser URL is already the last item or if history is empty
+                if (this.route_history.length === 0 || this.route_history[this.route_history.length - 1] !== projectBrowserUrl) {
+                    // Find the project browser URL in the history
+                    const browserUrlIndex = this.route_history.lastIndexOf(projectBrowserUrl);
+
+                    if (browserUrlIndex !== -1) {
+                        // If found, remove all entries after it
+                        this.route_history.splice(browserUrlIndex + 1);
+                    } else {
+                        // If not found (e.g., deep-linked), set history to just the project browser
+                        this.route_history = [projectBrowserUrl];
+                    }
+                }
+                // If projectBrowserUrl is already the last item, do nothing extra, watcher will handle it.
+
+            } else {
+                // Standard behavior: pop the last entry
+                this.route_history.pop();
+            }
         },
         closeDialogs(){
             this.route_history = []
