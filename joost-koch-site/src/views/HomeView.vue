@@ -1,9 +1,9 @@
 <template lang="pug">
-    div.h-100.w-100(style="position: relative")
+    div.w-100(style="position: relative; ")
         
-        WoodTexture.h-100(style="pointer-events: all;" ref="woodTexture")
-        div.fill-height.w-100(
-            style="position: absolute; top: 0; left: 0; overflow-y: scroll"
+        WoodTexture(style="position:absolute; pointer-events: all;" ref="woodTexture" :canvasHeight="homegrid_height")
+        div.w-100#home-grid(
+            style="position: absolute; min-height: 100vh"
             @mousemove="woodMouseMove"
         )   
             HomeGrid
@@ -44,16 +44,16 @@
                             h2 {{project.title}}
                             div.truncate-multi-line(v-html="processProjectContent(project.description, project.id)")
                 template(#div2 )
-                    div.w-100.h-100(style="position: relative; min-height: calc((100vh - 250px) / 2)")
+                    div.w-100.h-100(style="position: relative;")
 
-                        div.w-100.h-100.d-flex.flex-wrap#photo-container(
-                            style="position: absolute; top: 0; left: 0; height: 100%"
+                        div.w-100.d-flex.flex-wrap#photo-container(
+                            style="position: absolute; top: 0; left: 0; "
                         )
                             PolaroidPhoto(
                                 v-for="(image, index) in shown_images"
                                 @mouseover="image_hover_index = index"
                                 @mouseleave="image_hover_index = -1"
-                                :style="{'transform': 'rotate('+image.rotation+'deg)', 'max-width': '250px', 'max-height': 'calc('+(100 - image.top ) + '%' + (index < 1 ? ' - 30px)' : ')'), top:  'calc('+( image.top ) + '%' + (index < 1 ? ' +  40px)' : ')'), position: 'absolute', left: index * (70) / shown_images.length  + '%', 'z-index': image_hover_index == index ? '10 !important' : image.z_index}"
+                                :style="{'transform': 'rotate('+image.rotation+'deg)', 'max-width': '250px', 'max-height': 'calc('+(250) + 'px' + (index < 2 ? ' - 50px)' : ')'), top:  'calc('+( image.top ) + '%' + (index < 2 ? ' +  90px)' : ')'), position: 'absolute', left: index * (90) / shown_images.length  + '%', 'z-index': image_hover_index == index ? '10 !important' : image.z_index}"
                                 :image="image.imageUrl"
                                 :date="image.date ? image.date : undefined"
                             )
@@ -155,37 +155,38 @@
                                 loading="lazy"
                             )
 
-                        div.mb-3.ml-3.d-flex.flex-wrap
-                        v-icon.hover-shadow(
-                            style="font-size: 50px"
-                            icon="mdi-github"
-                            @click="open('https://github.com/TanteJossa')"
-                        )
-                        v-icon.ml-2.hover-shadow(
-                            style="font-size: 50px"
-                            icon="mdi-instagram"
-                            @click="open('https://www.instagram.com/joostkoch/')"
-                        )
-                        v-icon.ml-2.hover-shadow(
-                            style="font-size: 50px"
-                            icon="mdi-linkedin"
-                            @click="open('https://www.linkedin.com/in/joost-koch-a299aa269/')"
-                        )
-                        v-icon.ml-2.hover-shadow(
-                            style="font-size: 50px"
-                            icon="mdi-spotify"
-                            @click="open('https://open.spotify.com/user/q1v0gsdavetx3m2k1jm472nhx?si=5d330fcfbc3046e6')"
-                        )
-                        img.ml-2.hover-shadow(
-                            style="font-size: 50px; width: 50px; height: 50px; color: white"
-                            src="@/assets/Bluesky_Logo.svg"
-                            @click="open('https://bsky.app/profile/joost-koch.nl')"
-                        )
-                        v-icon.ml-2.hover-shadow(
-                            style="font-size: 50px"
-                            icon="mdi-twitter"
-                            @click="open('https://x.com/TanteJossa')"
-                        )
+                        div.mb-3.ml-3.d-flex.justify-start.flex-wrap
+                        
+                            v-icon.hover-shadow(
+                                style="font-size: 50px"
+                                icon="mdi-github"
+                                @click="open('https://github.com/TanteJossa')"
+                            )
+                            v-icon.ml-2.hover-shadow(
+                                style="font-size: 50px"
+                                icon="mdi-instagram"
+                                @click="open('https://www.instagram.com/joostkoch/')"
+                            )
+                            v-icon.ml-2.hover-shadow(
+                                style="font-size: 50px"
+                                icon="mdi-linkedin"
+                                @click="open('https://www.linkedin.com/in/joost-koch-a299aa269/')"
+                            )
+                            v-icon.ml-2.hover-shadow(
+                                style="font-size: 50px"
+                                icon="mdi-spotify"
+                                @click="open('https://open.spotify.com/user/q1v0gsdavetx3m2k1jm472nhx?si=5d330fcfbc3046e6')"
+                            )
+                            v-img.ml-2.hover-shadow(
+                                style="font-size: 50px; max-width: 40px; height: 50px; color: white"
+                                src="@/assets/Bluesky_Logo.svg"
+                                @click="open('https://bsky.app/profile/joost-koch.nl')"
+                            )
+                            v-icon.ml-2.hover-shadow(
+                                style="font-size: 50px"
+                                icon="mdi-twitter"
+                                @click="open('https://x.com/TanteJossa')"
+                            )
                 template(#div5)
                     div
 
@@ -370,7 +371,7 @@ export default {
     },
     data() {
         return {
-
+            update_homegrid: 0,
             is_moving_wood: false,
             project_hover_index: -1,
             shown_projects: [],
@@ -445,7 +446,17 @@ export default {
                 return this.images
             }
             return this.images.slice(0, Math.round(container.clientWidth / 220))
+        },
+        homegrid_height(){
+            this.update_homegrid-=1
+            const el = document.getElementById('home-grid')
+            console.log(el)
+            if (el){
+                return el.clientHeight + 'px'
+            }
+            return '100vh'
         }
+        
     },
     methods: {
         woodMouseMove(event){
@@ -795,6 +806,8 @@ export default {
         if (projects_container) {
             const observer = new ResizeObserver(() => {
                 this.shown_projects = this.shownProjects();
+
+                this.update_homegrid = true
             });
             observer.observe(projects_container);
         }
@@ -804,6 +817,9 @@ export default {
 
         // Now that projects are loaded, update shown_projects
         this.shown_projects = this.shownProjects();
+
+        this.update_homegrid++
+        console.log(this.homegrid_height)
 
     },
 };

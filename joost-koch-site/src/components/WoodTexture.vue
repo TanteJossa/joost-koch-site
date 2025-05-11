@@ -36,7 +36,10 @@ export default {
                 mouseMagnitude: 0.5,
             })
         },
-
+        canvasHeight: {
+            type: [Number, String],
+            default: 300 // Default to 300px, window.innerHeight can cause issues during SSR or if window is not available
+        }
     },
     emits: [],
     setup() {
@@ -309,6 +312,13 @@ export default {
                 this.setSettings()
             },
             deep: true,
+        },
+        canvasHeight: {
+            handler() {
+                if (this.gl) { // Ensure WebGL context is initialized
+                    this.resizeCanvas();
+                }
+            }
         }
     },
     // created() {
@@ -442,18 +452,44 @@ export default {
             this.updateUniforms()
         });
         // Resize canvas
-        const resizeCanvas = () => {
-            glCanvas.width = window.innerWidth;
-            glCanvas.height = window.innerHeight;
-            gl.viewport(0, 0, glCanvas.width, glCanvas.height);
-            const resolutionLocation = gl.getUniformLocation(this.shaderProgram, 'iResolution')
-            gl.uniform2f(resolutionLocation, glCanvas.width, glCanvas.height);
+        this.resizeCanvas = () => { // Assign to this to make it accessible in watcher
+            const glCanvas = document.getElementById('glCanvas'); // Ensure glCanvas is defined in this scope
+            if (!glCanvas || !this.gl) return; // Guard against missing canvas or GL context
+
+            glCanvas.width = window.innerWidth; // Keep width responsive for now, or make it a prop too
+            
+            let newHeight = this.canvasHeight;
+            if (typeof newHeight === 'string') {
+                if (newHeight.endsWith('px')) {
+                    newHeight = parseInt(newHeight, 10);
+                } else if (newHeight.endsWith('vh')) {
+                    newHeight = window.innerHeight * (parseInt(newHeight, 10) / 100);
+                } else if (newHeight.endsWith('%')) {
+                    // Assuming parent container for percentage height, which might be tricky with canvas
+                    // For simplicity, let's assume direct assignment or pixel/vh values are primary
+                    // Fallback or specific logic might be needed for robust percentage handling
+                    const parentHeight = glCanvas.parentElement ? glCanvas.parentElement.clientHeight : window.innerHeight;
+                    newHeight = parentHeight * (parseInt(newHeight, 10) / 100);
+                } else {
+                    // If it's a string but not 'px' or 'vh', try to parse as number, or use as is if browser supports
+                    const parsed = parseInt(newHeight, 10);
+                    if (!isNaN(parsed)) {
+                        newHeight = parsed;
+                    }
+                }
+            }
+            
+            glCanvas.height = newHeight;
+
+            this.gl.viewport(0, 0, glCanvas.width, glCanvas.height);
+            const resolutionLocation = this.gl.getUniformLocation(this.shaderProgram, 'iResolution')
+            this.gl.uniform2f(resolutionLocation, glCanvas.width, glCanvas.height);
             this.calculateSamples();
             this.updateUniforms();
         }
 
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        window.addEventListener('resize', this.resizeCanvas);
+        this.resizeCanvas();
 
         // Rendering loop
         const render = () => {

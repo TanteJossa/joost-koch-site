@@ -64,15 +64,15 @@ export default {
 <style scoped>
 .parent {
   gap: 0; 
-  max-height: 100vh; 
-  max-width: 100vw;
+  /* max-height: 100vh;  */
+  /* max-width: 100vw; */
   /* overflow: hidden; */
 }
 
 .md-up { 
   display: grid;
   grid-template-columns: 1fr min(700px, 100vw) 1fr;
-  grid-template-rows: 1fr 0.5fr 1fr;
+  grid-template-rows: 1fr 180px 1fr;
 }
 
 .md-up .div1 { grid-area: 1 / 1 / 1 / 3; }
