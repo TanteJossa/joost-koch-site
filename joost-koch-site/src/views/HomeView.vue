@@ -44,7 +44,7 @@
                             h2 {{project.title}}
                             div.truncate-multi-line(v-html="processProjectContent(project.description, project.id)")
                 template(#div2 )
-                    div.w-100.h-100(style="position: relative;")
+                    div.w-100(style="position: relative; min-height: 350px")
 
                         div.w-100.d-flex.flex-wrap#photo-container(
                             style="position: absolute; top: 0; left: 0; "
@@ -53,7 +53,8 @@
                                 v-for="(image, index) in shown_images"
                                 @mouseover="image_hover_index = index"
                                 @mouseleave="image_hover_index = -1"
-                                :style="{'transform': 'rotate('+image.rotation+'deg)', 'max-width': '250px', 'max-height': 'calc('+(250) + 'px' + (index < 2 ? ' - 50px)' : ')'), top:  'calc('+( image.top ) + '%' + (index < 2 ? ' +  90px)' : ')'), position: 'absolute', left: index * (90) / shown_images.length  + '%', 'z-index': image_hover_index == index ? '10 !important' : image.z_index}"
+                                @polaroid-click="openPolaroidDialog"
+                                :style="{'transform': 'rotate('+image.rotation+'deg)', 'max-width': '250px', 'height': 'calc('+(250) + 'px' + (index < 2 ? ' - 50px)' : ')'), top:  'calc('+( image.top ) + '%' + (index < 2 ? ' +  90px)' : ')'), position: 'absolute', left: index * (90) / shown_images.length  + '%', 'z-index': image_hover_index == index ? '10 !important' : image.z_index}"
                                 :image="image.imageUrl"
                                 :date="image.date ? image.date : undefined"
                             )
@@ -313,13 +314,13 @@
         max-width="90vw"
         width="auto"
     )
-        v-card(style="display: flex; flex-direction: column; max-height: 90vh;")
+        v-card(v-if="dialogContentType === 'image'" style="display: flex; flex-direction: column; max-height: 90vh;")
             v-toolbar(
                 dark
                 color="primary"
                 density="compact"
             )
-                v-toolbar-title {{ selectedImageAlt }}
+                v-toolbar-title {{ dialogContentType === 'polaroid' ? 'Polaroid' : selectedImageAlt }}
                 v-spacer
                 v-btn(
                     icon
@@ -330,12 +331,20 @@
             v-card-text.d-flex.justify-center.align-center.flex-grow-1(
                 style="overflow: auto; background-color: #212121;"
             )
-                v-img(
-                    :src="selectedImageUrl"
-                    :alt="selectedImageAlt"
-                    contain
-                    style="max-height: 100%; max-width: 100%;"
-                )
+                div()
+                    v-img(
+                        :src="selectedImageUrl"
+                        :alt="selectedImageAlt"
+                        contain
+                        style="max-height: 100%; max-width: 100%;"
+                    )
+        div(v-else-if="dialogContentType === 'polaroid'" style="height:  min(1000px, 80vh);width: min(800px, 90vw);")
+            PolaroidPhoto(
+                v-if="selectedPolaroidData"
+                :image="selectedPolaroidData.image"
+                :date="selectedPolaroidData.date"
+                
+            )
 
 </template>
 
@@ -399,6 +408,8 @@ export default {
             imageDialogVisible: false,
             selectedImageUrl: null,
             selectedImageAlt: '',
+            selectedPolaroidData: null,
+            dialogContentType: null,
 
         }
     },
@@ -459,6 +470,13 @@ export default {
         
     },
     methods: {
+        openPolaroidDialog(polaroidData) {
+            this.selectedPolaroidData = polaroidData;
+            this.selectedImageUrl = polaroidData.image;
+            this.selectedImageAlt = polaroidData.date ? `Polaroid from ${polaroidData.date}` : 'Polaroid Photo';
+            this.dialogContentType = 'polaroid';
+            this.imageDialogVisible = true;
+        },
         woodMouseMove(event){
             const component = this.$refs.woodTexture;
             if (!component) return;
@@ -575,6 +593,8 @@ export default {
         openImageDialog(imageUrl, altText) {
             this.selectedImageUrl = imageUrl;
             this.selectedImageAlt = altText;
+            this.selectedPolaroidData = null;
+            this.dialogContentType = 'image';
             this.imageDialogVisible = true;
         },
 
@@ -866,8 +886,8 @@ export default {
 }
 .post-it {
 
-    height: 200px; /* Fixed height */
-    width: 200px;
+    max-height: 200px; /* Fixed height */
+    max-width: 200px;
     font-size: clamp(0.8rem, 0.5vw, 2rem);
     padding: 10px; /* Added padding for content */
     overflow: hidden; /* Hide overflowing content */
@@ -880,8 +900,8 @@ export default {
     overflow: hidden;         
     text-overflow: ellipsis;  
     display: -webkit-box;     
-    line-clamp: 3;
-    -webkit-line-clamp: 3;    
+    line-clamp: 2;
+    -webkit-line-clamp: 2;    
     -webkit-box-orient: vertical;
 
 }

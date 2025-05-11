@@ -1,7 +1,7 @@
 <template lang="pug">
 
 div.polaroid-container.hover-shadow( )
-    div.polaroid(@mouseover="isHovered = true" @mouseleave="isHovered =false")
+    div.polaroid(@mouseover="isHovered = true" @mouseleave="isHovered =false" @click="handleClick")
         div.image-container
             img.h-100.w-100(:src="image" cover style="object-fit: cover; aspect-ratio: 5/4" alt="Polaroid Photo")
             div(:class="show_glint ? 'glint' : ''")
@@ -11,6 +11,7 @@ div.polaroid-container.hover-shadow( )
 <script>
 export default {
     name: 'PolaroidPhoto',
+    emits: ['polaroid-click'],
     props: {
         image: {
             type: String,
@@ -29,6 +30,12 @@ export default {
     },
     methods: {
 
+        handleClick() {
+            this.$emit('polaroid-click', {
+                image: this.image,
+                date: this.date,
+            });
+        },
     },
     watch: {
         isHovered(){
@@ -62,7 +69,7 @@ export default {
 
 .polaroid {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 250px;
+    /* width: 250px; */
     height: min-content;
     /* max-height: calc(100% - 50px); */
     position: relative;
@@ -86,7 +93,7 @@ export default {
     overflow: hidden;
     border: 2px solid #ccc;
     background: #f5f5f5;
-    max-height: calc(100% - 40px);
+    /* max-height: calc(100% - 40px); */
     width: fit-content;
     
 }
