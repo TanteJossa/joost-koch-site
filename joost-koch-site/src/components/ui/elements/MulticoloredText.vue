@@ -1,6 +1,6 @@
 <template lang="pug">
 span(:class="is_clickable ? 'text-hover' : ''")
-    span(v-for="(letter, index) in letters" :key="index" :style="{ color: colors[index] }">) {{ letter }}
+    span(v-for="(letter, index) in letters" :key="index" :style="{ color: colors[index] }") {{ letter }}
 </template>
 
 <script>
@@ -41,7 +41,7 @@ export default {
     },
     methods: {
         generateRandomColor() {
-            return '#ffffff'
+            return '#ffffff';
             // const letters = '0123456789ABCDEF';
             // let color = '#';
             // for (let i = 0; i < 6; i++) {

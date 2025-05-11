@@ -28,7 +28,6 @@ div.w-100(style="position: relative; min-height: 350px")
 import MulticoloredText from '@/components/ui/elements/MulticoloredText.vue';
 import PolaroidPhoto from '@/components/ui/media/PolaroidPhoto.vue';
 import { getUniqueIntegers } from '../../../helpers';
-// extractDateFromFilename is not directly used in the moved loadRandomImages, but getUniqueIntegers is.
 
 export default {
     name: 'PhotosSection',
@@ -63,13 +62,12 @@ export default {
         },
         async loadRandomImages() {
             const ids = getUniqueIntegers(5, 1, 62);
-            const imageModules = import.meta.glob('@/assets/luft/*.png', { as: 'url', eager: true });
+            const imageModules = import.meta.glob('@/assets/luft/*.png', { query: '?url', import: 'default', eager: true });
             const imageList = Object.entries(imageModules).map(([path]) => ({
                 filename: path.split('/').pop(),
                 // Directly use the URL
                 url: imageModules[path],
             }));
-            console.log(imageList);
             this.images = [];
             await Promise.all(
                 ids.map(async (index) => {
@@ -79,8 +77,6 @@ export default {
                     const { filename, url } = imageList[index];
 
                     try {
-                        // const module = await import(/* @vite-ignore */ `${url}`);
-                        // const imageUrl = module.default;
 
                         // Extract date from filename (IMG_YYYYMMDD_...)
                         const dateMatch = filename.match(/IMG_(\d{8})_/);
@@ -107,7 +103,6 @@ export default {
                     }
                 })
             );
-            console.log(this.images);
         },
     },
     mounted() {
@@ -129,7 +124,8 @@ export default {
     flex-wrap: wrap;
 }
 .ml-6 {
-    margin-left: 2.25rem; /* Approximation for Vuetify ml-6, adjust if precise value is known */
+    margin-left: 2.25rem;
+    /* Approximation for Vuetify ml-6, adjust if precise value is known */
 }
 /* Styles for PolaroidPhoto and MulticoloredText are in their respective components */
 </style>

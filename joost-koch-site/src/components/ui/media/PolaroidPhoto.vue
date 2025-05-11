@@ -43,7 +43,7 @@ export default {
                 this.show_glint = true;
                 setTimeout(() => {
                     this.show_glint = false;
-                // Matches the animation duration
+                    // Matches the animation duration
                 }, 1500);
             }
 
@@ -70,9 +70,7 @@ export default {
 
 .polaroid {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    /* width: 250px; */
     height: min-content;
-    /* max-height: calc(100% - 50px); */
     position: relative;
     padding: 10px;
     background: white;
@@ -94,15 +92,10 @@ export default {
     overflow: hidden;
     border: 2px solid #ccc;
     background: #f5f5f5;
-    /* max-height: calc(100% - 40px); */
     width: fit-content;
     
 }
 
-/* .image-container img {
-    height: 100%;
-    display: block;
-} */
 
 .glint {
     position: absolute;
@@ -111,7 +104,6 @@ export default {
     width: 200%;
     height: 100%;
     background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-    /* transform: skewX(-30deg); */
     animation: glint-animation 2s infinite;
 }
 

@@ -16,7 +16,7 @@
 // Components
 
 export default {
-    name: 'PostItNote', // Renamed from PostIt
+    name: 'PostIt',
     components: {
 
     },
@@ -110,5 +110,6 @@ export default {
   right: 0;
   z-index: 1;
 }
+
 
 </style>

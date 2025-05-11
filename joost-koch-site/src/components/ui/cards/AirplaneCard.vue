@@ -5,7 +5,7 @@ v-card
 </template>
 
 <script>
-// Data 
+// Data
 
 // Components
 

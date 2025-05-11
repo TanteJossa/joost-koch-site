@@ -154,12 +154,16 @@ export default {
     text-overflow: ellipsis;  
     display: -webkit-box;     
     /* Fallback for non-webkit */
-    line-clamp: 3; /* Adjust number of lines for post-it note */
-    -webkit-line-clamp: 3; /* Adjust number of lines for post-it note */   
+    line-clamp: 3;
+    /* Adjust number of lines for post-it note */
+    -webkit-line-clamp: 3;
+    /* Adjust number of lines for post-it note */
     -webkit-box-orient: vertical;
     /* Fallback for max-height */
-    max-height: calc(1.2em * 3); /* line-height * line-clamp */
-    line-height: 1.2em; /* Ensure consistent line height */
+    max-height: calc(1.2em * 3);
+    /* line-height * line-clamp */
+    line-height: 1.2em;
+    /* Ensure consistent line height */
 
 }
 
@@ -175,6 +179,7 @@ export default {
     /* Add any necessary styling for the container itself, e.g., to ensure it has width */
     width: 100%; 
     /* Or other appropriate width management */
-    min-height: 220px; /* Ensure it has some height for observer */
+    min-height: 220px;
+    /* Ensure it has some height for observer */
 }
 </style>

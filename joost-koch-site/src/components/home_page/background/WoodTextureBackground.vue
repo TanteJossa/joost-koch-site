@@ -5,7 +5,7 @@
 </template>
 
 <script>
-// Data
+// Data 
 
 
 // Components
@@ -38,8 +38,7 @@ export default {
         },
         canvasHeight: {
             type: [Number, String],
-            // Default to 300px, window.innerHeight can cause issues during SSR or if window is not available
-            default: 300 
+            default: 300 // Default to 300px, window.innerHeight can cause issues during SSR or if window is not available
         }
     },
     emits: [],
@@ -202,12 +201,9 @@ export default {
         },
         calculateBrownColor(grayValue) {
             // Map grayscale (0-1) to brown shades
-            // Red component
-            const r = 0.4 + 0.5 * (grayValue * 0.6); 
-            // Green component
-            const g = 0.1 + 0.5 * (grayValue * 0.5);  
-            // Blue component
-            const b = 0.02 + 0.5 * (grayValue * 0.18);    
+            const r = 0.4 + 0.5 * (grayValue * 0.6); // Red component
+            const g = 0.1 + 0.5 * (grayValue * 0.5);  // Green component
+            const b = 0.02 + 0.5 * (grayValue * 0.18);    // Blue component
             return [r, g, b];
         },
         calculateSamples() {
@@ -257,7 +253,7 @@ export default {
                 this.gaussianX[i] = 0.5 + sign ;
                 this.gaussianY[i] = 0.5 + sign * 0.7;
 
-                console.log(this.gaussianX[i],this.gaussianY[i])
+                // console.log(this.gaussianX[i],this.gaussianY[i])
                 this.gaussianSigmaX[i] = 0.5;
                 this.gaussianMagnitude[i] = 0.4;
                 this.gaussianSigmaY[i] = 0.5;
@@ -319,8 +315,7 @@ export default {
         },
         canvasHeight: {
             handler() {
-                // Ensure WebGL context is initialized
-                if (this.gl) { 
+                if (this.gl) { // Ensure WebGL context is initialized
                     this.resizeCanvas();
                 }
             }
@@ -457,15 +452,11 @@ export default {
             this.updateUniforms()
         });
         // Resize canvas
-        // Assign to this to make it accessible in watcher
-        this.resizeCanvas = () => { 
-            // Ensure glCanvas is defined in this scope
-            const glCanvas = document.getElementById('glCanvas'); 
-            // Guard against missing canvas or GL context
-            if (!glCanvas || !this.gl) return; 
+        this.resizeCanvas = () => { // Assign to this to make it accessible in watcher
+            const glCanvas = document.getElementById('glCanvas'); // Ensure glCanvas is defined in this scope
+            if (!glCanvas || !this.gl) return; // Guard against missing canvas or GL context
 
-            // Keep width responsive for now, or make it a prop too
-            glCanvas.width = window.innerWidth; 
+            glCanvas.width = window.innerWidth; // Keep width responsive for now, or make it a prop too
             
             let newHeight = this.canvasHeight;
             if (typeof newHeight === 'string') {
@@ -507,65 +498,57 @@ export default {
                 const dy = this.gaussianY[i] - this.mousePosition[1];
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 if (distance < 0.3) {
-                    // Move gaussian away from mouse
-                    const moveFactor = (0.3 - distance) * 0.01; // Adjust strength of repulsion
-                    this.gaussianX[i] += dx / distance * moveFactor;
-                    this.gaussianY[i] += dy / distance * moveFactor;
-
-                    // Optional: Clamp to keep within bounds [0, 1]
-                    this.gaussianX[i] = Math.max(0, Math.min(1, this.gaussianX[i]));
-                    this.gaussianY[i] = Math.max(0, Math.min(1, this.gaussianY[i]));
-                } else {
-                    // Gradually return to original position
-                    const returnFactor = 0.005; // Adjust speed of return
-                    this.gaussianX[i] += (this.originalGaussianPositions[i].x - this.gaussianX[i]) * returnFactor;
-                    this.gaussianY[i] += (this.originalGaussianPositions[i].y - this.gaussianY[i]) * returnFactor;
+                    const repulsionStrength = -0.01 * ( (distance - 0.3) / 0.3 )
+                    this.gaussianX[i] += dx * repulsionStrength;
+                    this.gaussianY[i] += dy * repulsionStrength;
+                    continue
                 }
+
+                const originalX = this.originalGaussianPositions[i].x;
+                const originalY = this.originalGaussianPositions[i].y;
+                const dxOriginal = this.gaussianX[i] - originalX;
+                const dyOriginal = this.gaussianY[i] - originalY;
+                const distanceOriginal = Math.sqrt(dxOriginal * dxOriginal + dyOriginal * dyOriginal);
+                const returnSpeed = 0.05;
+                if (distanceOriginal > 0.2) {
+                    this.gaussianX[i] += (originalX - this.gaussianX[i]) * returnSpeed * 0.5;
+                    this.gaussianY[i] += (originalY - this.gaussianY[i]) * returnSpeed * 0.5;
+                }
+                else if (distanceOriginal > 0.01) {
+                    this.gaussianX[i] += (originalX - this.gaussianX[i]) * returnSpeed;
+                    this.gaussianY[i] += (originalY - this.gaussianY[i]) * returnSpeed;
+                } else {
+                    this.gaussianX[i] = originalX;
+                    this.gaussianY[i] = originalY;
+                }
+
+
             }
-            this.updateUniforms();
-
-
             gl.clearColor(0.0, 0.0, 0.0, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-            gl.vertexAttribPointer(this.vertexPosition, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(this.vertexPosition);
+            gl.vertexAttribPointer(this.vertexPosition, 2, gl.FLOAT, false, 0, 0);
 
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
+            this.updateUniforms();
             requestAnimationFrame(render);
-        };
-
-        render();
-    },
-    beforeUnmount() {
-        window.removeEventListener('resize', this.resizeCanvas);
-        // Add any other cleanup for WebGL resources if necessary
-        if (this.gl) {
-            if (this.shaderProgram) {
-                this.gl.deleteProgram(this.shaderProgram);
-            }
-            if (this.positionBuffer) {
-                this.gl.deleteBuffer(this.positionBuffer);
-            }
-            // Detach shaders, delete shaders, etc.
         }
-    }
+
+
+        requestAnimationFrame(render);
+
+    },
+
 
 }
 </script>
 
 <style scoped>
-.container {
-    width: 100%;
-    height: 100%;
-    /* overflow: hidden; */
-}
 
-#glCanvas {
-    width: 100%;
-    height: 100%;
+
+canvas {
     display: block;
 }
 </style>

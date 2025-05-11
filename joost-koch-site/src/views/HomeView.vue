@@ -1,183 +1,51 @@
 <template lang="pug">
-    div.w-100(style="position: relative; ")
-        
-        WoodTextureBackground(style="position:absolute; pointer-events: all;" ref="woodTexture" :canvasHeight="homegrid_height")
-        div.w-100#home-grid(
-            style="position: absolute; min-height: 100vh"
-            @mousemove="woodMouseMove"
-        )   
-            HomeGrid
-                template(#name)
-                    NameSection
-                template(#div1)
-                    ProjectsSection(
-                        :projects="projects"
-                        @open-projects-view="handleOpenProjectsView"
-                        @open-project-details="handleOpenProjectDetails"
-                    )
-                template(#div2 )
-                    PhotosSection(@show-polaroid-dialog="openPolaroidDialog")
-                template(#div3)
-                    MediaSection
-                template(#div4)
-                    LinksSection
-                template(#div5)
-                    div
-
-
-    div(
-        v-for="route in richRouteHistory"
+div.w-100.home-view-wrapper
+    
+    WoodTextureBackground.wood-texture-background(ref="woodTexture" :canvasHeight="homegrid_height" )
+    div.w-100#home-grid.home-grid-container(
+        @mousemove="woodMouseMove"
     )
-        v-overlay.d-flex.justify-center(
-            :modelValue="true"
-            @update:modelValue="goBack"
-            :style="{'padding-top': $vuetify.display.mdAndUp ? '50px' : ''}"
-        )
-            v-card(:style="{'width': '100vw', 'max-width': '800px', 'height': 'calc(100vh - '+($vuetify.display.mdAndUp ? 100 : 0)+'px)'}")
-                v-card-title.d-flex.flex-row.align-center
-                    v-icon(
-                        icon="mdi-arrow-left"
-                        @click="goBack"
-                    )
-                    h2 {{ route.title }}
-                    v-icon.ml-auto(
-                        icon="mdi-close"
-                        @click="closeDialogs"
-                    )
-                v-divider
-                v-card-text(style="height: calc(100% - 50px)")
-                    div.h-100(v-if="route.type == 'projects' && !route.id")
-                        div.d-flex.flex-row
-                            v-text-field(
-                                v-model="project_search"
-                                label="Search Project"
-                                style="width: calc(100% - 200px)"
-                            )
-                            v-select(
-                                :items="['Date', 'Title', 'Rank']"
-                                v-model="project_sort"
-                                label="Sort"
-                            )
-                        div.d-flex.flex-wrap(style="overflow-y: scroll; height: calc(100% - 60px)")
-                            v-card.ma-1.project-card(
-                                color="light-grey"
-                                v-ripple
-                                v-for="project in sorted_projects"
-                                :key="project.id"
-                                :style="{'width': $vuetify.display.mdAndUp ? 'calc(50% - 8px)' : '100%'}"
-                                @click="openProject(project.id)"
-                            )
-                                v-card-title {{project.title}}
-                                v-card-text
-                                    v-row(no-gutters)
-                                        v-col(v-if="project.images && project.images.length > 0 && project.images[0]", cols="auto", style="min-width: 92px;")
-                                            img(
-                                                :src="getProjectImageUrl(project.id, project.images[0])"
-                                                :alt="project.title + ' thumbnail'"
-                                                style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; margin-right: 12px;"
-                                            )
-                                        v-col
-                                            div(style="font-size: 0.9em;") {{ getTruncatedDescription(project.description) }}
-                    div.h-100(
-                        v-if="route.type == 'projects' && route.id"
-                        :set="project = getProjectFromId(route.id)"
-                        style="overflow-y: auto;"
-                    )
-                        div.d-flex.flex-row.align-center.mb-2
-                            h2.text-grey.mr-2 \#{{project.rank}}
-                            h2 {{ project.title }}
-                            v-spacer
-                            v-btn(v-if="project.url" :href="project.url" target="_blank" icon variant="text" density="compact")
-                                v-icon(icon="mdi-open-in-new")
-                            v-btn(v-if="project.github" :href="project.github" target="_blank" icon variant="text" density="compact")
-                                v-icon(icon="mdi-github")
-                        
-                        p.text-caption.text-grey-darken-1 {{ getPrettyDate(project.date) }} | Status: {{ project.status }}
-
-                        div.mt-2(v-if="project.team && project.team.length > 0")
-                            strong Team:
-                            span {{ project.team.join(', ') }}
-                        
-                        div.mt-2(v-if="project.tags && project.tags.length > 0")
-                            strong Tags:
-                            v-chip.ma-1(v-for="tag in project.tags" :key="tag" small density="compact") {{ tag }}
-                        
-                        div.mt-2(v-if="project.technologies && project.technologies.length > 0")
-                            strong Technologies:
-                            v-chip.ma-1(v-for="tech in project.technologies" :key="tech" small density="compact") {{ tech }}
-
-                        div.mt-3(v-html="processProjectContent(project.description, project.id)")
-                        
-                        div.mt-3(v-if="project.long_description" v-html="processProjectContent(project.long_description, project.id)")
-
-                        div.mt-4(v-if="project.images && project.images.length > 0")
-                            h3.mb-2 Images:
-                            div.d-flex.flex-wrap.ga-2
-                                img.ma-1(
-                                    v-for="imageName in project.images"
-                                    :key="imageName"
-                                    :src="getProjectImageUrl(project.id, imageName)"
-                                    :alt="project.title + ' - ' + imageName"
-                                    style="max-width: 200px; max-height: 150px; height: auto; border-radius: 4px; object-fit: cover; border: 1px solid #eee; cursor: pointer;"
-                                    @click="openImageDialog(getProjectImageUrl(project.id, imageName), project.title + ' - ' + imageName)"
-                                )
-                        
-                        div.mt-4(v-if="project.pdfs && project.pdfs.length > 0")
-                            h3.mb-2 Associated Files:
-                            div.d-flex.flex-wrap.ga-2
-                                v-card.pa-2.ma-1(
-                                    v-for="pdfName in project.pdfs"
-                                    :key="pdfName"
-                                    link
-                                    :href="getProjectPdfUrl(project.id, pdfName)"
-                                    target="_blank"
-                                    style="min-width: 150px; text-decoration: none;"
-                                    hover
-                                )
-                                    v-row(align="center" no-gutters)
-                                        v-col(cols="auto")
-                                            v-icon.mr-2(icon="mdi-file-pdf-box" size="large" color="red-darken-2")
-                                        v-col
-                                            div(style="font-size: 0.9em; word-break: break-all;") {{ pdfName }}
-
-    v-dialog(
-        v-model="imageDialogVisible"
-        transition="dialog-bottom-transition"
-        overlay-opacity="0.7"
-        max-width="90vw"
-        width="auto"
-    )
-        v-card(v-if="dialogContentType === 'image'" style="display: flex; flex-direction: column; max-height: 90vh;")
-            v-toolbar(
-                dark
-                color="primary"
-                density="compact"
-            )
-                v-toolbar-title {{ dialogContentType === 'polaroid' ? 'Polaroid' : selectedImageAlt }}
-                v-spacer
-                v-btn(
-                    icon
-                    dark
-                    @click="imageDialogVisible = false"
+        HomeGrid
+            template(#name)
+                NameSection(
+                    v-model="is_moving_wood"
                 )
-                    v-icon mdi-close
-            v-card-text.d-flex.justify-center.align-center.flex-grow-1(
-                style="overflow: auto; background-color: #212121;"
-            )
-                div()
-                    v-img(
-                        :src="selectedImageUrl"
-                        :alt="selectedImageAlt"
-                        contain
-                        style="max-height: 100%; max-width: 100%;"
-                    )
-        div(v-else-if="dialogContentType === 'polaroid'" style="height:  min(1000px, 80vh);width: min(800px, 90vw);")
-            PolaroidPhoto(
-                v-if="selectedPolaroidData"
-                :image="selectedPolaroidData.image"
-                :date="selectedPolaroidData.date"
-                
-            )
+            template(#div1)
+                ProjectsSection(
+                    :projects="projects"
+                    @open-projects-view="handleOpenProjectsView"
+                    @open-project-details="handleOpenProjectDetails"
+                )
+            template(#div2 )
+                PhotosSection(@show-polaroid-dialog="openPolaroidDialog")
+            template(#div3)
+                MediaSection
+            template(#div4)
+                LinksSection
+            template(#div5)
+                div
+RouteDrivenOverlay(
+        :richRouteHistory="richRouteHistory"
+        :projects="projects"
+        :projectSearch="project_search"
+        :projectSort="project_sort"
+        @go-back="goBack"
+        @close-all-dialogs="closeDialogs"
+        @update:projectSearch="project_search = $event"
+        @update:projectSort="project_sort = $event"
+        @open-project="handleOpenProjectDetails"
+        @open-image-dialog="handleOpenImageDialogFromOverlay"
+    )
+    ImageLightBox(
+        v-model:modelValue="imageDialogVisible"
+        :dialogContentType="dialogContentType"
+        :selectedImageUrl="selectedImageUrl"
+        :selectedImageAlt="selectedImageAlt"
+        :selectedPolaroidData="selectedPolaroidData"
+    )
+
+
+
 
 </template>
 
@@ -187,6 +55,8 @@ import WoodTextureBackground from '@/components/home_page/background/WoodTexture
 import { PowerGlitch } from 'powerglitch'
 // Adjust path as needed
 import HomeGrid from '@/components/home_page/layout/HomeGrid.vue';
+import RouteDrivenOverlay from '@/components/overlays/RouteDrivenOverlay.vue';
+import ImageLightBox from '@/components/overlays/ImageLightBox.vue';
 import ProjectsSection from '@/components/home_page/projects_section/ProjectsSection.vue';
 import PhotosSection from '@/components/home_page/photos_section/PhotosSection.vue';
 import MediaSection from '@/components/home_page/media_section/MediaSection.vue';
@@ -206,7 +76,9 @@ export default {
         ProjectsSection,
         PhotosSection,
         MediaSection,
-        LinksSection
+        LinksSection,
+        RouteDrivenOverlay,
+        ImageLightBox
     },
     setup(){
 
@@ -226,13 +98,13 @@ export default {
             
 
             // projects_text_rotation removed
-
-
             imageDialogVisible: false,
             selectedImageUrl: null,
             selectedImageAlt: '',
             selectedPolaroidData: null,
             dialogContentType: null,
+
+            is_moving_wood: false,
 
         }
     },
@@ -247,37 +119,37 @@ export default {
             return {type: 'home', id: ''}
         },
         richRouteHistory(){
-            return this.route_history.map(e => {
-                const route_data = this.getRouteData(e)
-                var rich_route_data = {}
-                rich_route_data.is_item_page = ![undefined, ''].includes(route_data.id)
-                rich_route_data.type = route_data.type
-                rich_route_data.id = route_data.id
+            return this.route_history.map(path => { // path is the full path string
+                const route_data = this.getRouteData(path);
+                if (!route_data) return { path: path, title: 'Unknown', type: 'unknown' }; // Handle invalid route_data
 
-                rich_route_data.title = {
-                    "projects": rich_route_data.id ? 'Project' : 'Projects'
-                }[route_data.type]
+                var rich_route_data = {
+                    path: path, // Store the original path for keying
+                    type: route_data.type,
+                    id: route_data.id,
+                    imageUrl: route_data.imageUrl,
+                    altText: route_data.altText,
+                    isPolaroid: route_data.isPolaroid,
+                    polaroidDate: route_data.polaroidDate, // Pass as is (ISO string or null)
+                };
+
+                rich_route_data.is_item_page = ![undefined, null, ''].includes(route_data.id) || (route_data.type === 'image');
+
+                if (route_data.type === 'projects') {
+                    rich_route_data.title = route_data.id ? 'Project' : 'Projects';
+                } else if (route_data.type === 'image') {
+                    rich_route_data.title = route_data.isPolaroid ? 'Polaroid' : (route_data.altText || 'Image');
+                } else {
+                    rich_route_data.title = 'Detail'; // Default title
+                }
                 
-                return rich_route_data
-
-            })
-        },
-        sorted_projects(){
-            if (!this.projects || this.projects.length === 0) {
-                return [];
-            }
-            const sort_method = {
-                "Date": (a,b) => a.date.getTime() - b.date.getTime(),
-                "Title": (a,b) => a.title > b.title ? 1 : -1,
-                "Rank": (a,b) => a.rank - b.rank,
-            }[this.project_sort]
-
-            return this.projects.filter(e => e.title.toLowerCase().includes(this.project_search.toLowerCase())).sort((a,b) => sort_method(a,b))
+                return rich_route_data;
+            });
         },
         homegrid_height(){
             this.update_homegrid-=1
             const el = document.getElementById('home-grid')
-            console.log(el)
+            // console.log(el)
             if (el){
                 return el.clientHeight + 'px'
             }
@@ -286,12 +158,33 @@ export default {
         
     },
     methods: {
+            handleOpenImageDialogFromOverlay(imageUrl, altText) { // Changed signature
+                const finalImageUrl = imageUrl === undefined ? '' : imageUrl;
+                const finalAltText = altText === undefined ? 'Image' : altText; // Default to 'Image' if alt is undefined
+
+                const imageData = {
+                    imageUrl: finalImageUrl,
+                    altText: finalAltText,
+                    isPolaroid: false,
+                    polaroidDate: null
+                };
+                const new_url = this.routeDataToUrl('image', imageData);
+                if (new_url) {
+                    this.route_history.push(new_url);
+                }
+            },
         openPolaroidDialog(polaroidData) {
-            this.selectedPolaroidData = polaroidData;
-            this.selectedImageUrl = polaroidData.image;
-            this.selectedImageAlt = polaroidData.date ? `Polaroid from ${polaroidData.date}` : 'Polaroid Photo';
-            this.dialogContentType = 'polaroid';
-            this.imageDialogVisible = true;
+            const altText = polaroidData.date ? `Polaroid from ${new Date(polaroidData.date).toLocaleDateString()}` : 'Polaroid Photo';
+            const imageData = {
+                imageUrl: polaroidData.image,
+                altText: altText,
+                isPolaroid: true,
+                polaroidDate: polaroidData.date ? (polaroidData.date instanceof Date ? polaroidData.date.toISOString() : new Date(polaroidData.date).toISOString()) : null // Ensure ISO string
+            };
+            const new_url = this.routeDataToUrl('image', imageData);
+            if (new_url) {
+                this.route_history.push(new_url);
+            }
         },
         woodMouseMove(event){
             const component = this.$refs.woodTexture;
@@ -307,7 +200,7 @@ export default {
             this.route_history.push(this.routeDataToUrl('projects'));
         },
         handleOpenProjectDetails(id) {
-            this.route_history.push(this.routeDataToUrl('projects', id));
+            this.route_history.push(this.routeDataToUrl('projects', { id: id }));
         },
         overlayGoBack(){
             this.overlay_type = {
@@ -316,30 +209,57 @@ export default {
             }[this.overlay_type]
             this.overlay_came_from = ""
         },
-        getRouteData(route){
+        getRouteData(routePath) {
             var route_data = {
                 type: '',
-                id: '',
-            }
-            const route_array = route.split('/')
-            if (route_array[1] == 'projects') {
+                id: null, // Ensure id is explicitly handled, null for image routes
+                imageUrl: null,
+                altText: null,
+                isPolaroid: false,
+                polaroidDate: null,
+            };
+            const parts = routePath.split('?');
+            const path = parts[0];
+            const queryParams = new URLSearchParams(parts[1] || '');
+
+            const route_array = path.split('/');
+            if (route_array[1] === 'projects') {
                 route_data.type = 'projects';
                 if (route_array.length > 2) {
-                    route_data.id = route_array[2]
-                };
+                    route_data.id = route_array[2];
+                }
+            } else if (route_array[1] === 'image-viewer') {
+                route_data.type = 'image';
+                route_data.imageUrl = queryParams.get('src');
+                route_data.altText = queryParams.get('alt');
+                route_data.isPolaroid = queryParams.get('isPolaroid') === 'true';
+                route_data.polaroidDate = queryParams.get('date'); // Will be an ISO string or null
             } else {
-                return false
+                return false; // Or handle as 'home' or invalid
             }
-
-            return route_data
+            return route_data;
         },
-        routeDataToUrl(type, id){
-            var route_type_name = ''
-            if (type == 'projects') {
-                route_type_name = 'projects';
-            }
+        routeDataToUrl(type, dataObject) { // Changed signature to dataObject
+            if (type === 'projects') {
+                return '/projects' + (dataObject && dataObject.id ? '/' + dataObject.id : '');
+            } else if (type === 'image' && dataObject) {
+                // Add robust checks for undefined before encodeURIComponent
+                const src = dataObject.imageUrl === undefined ? '' : dataObject.imageUrl;
+                const alt = dataObject.altText === undefined ? 'Image' : dataObject.altText; // Default to 'Image'
+                const date = dataObject.polaroidDate === undefined ? null : dataObject.polaroidDate;
 
-            return '/' + route_type_name + (id ? '/' + id : '')
+                let url = `/image-viewer?src=${encodeURIComponent(src)}&alt=${encodeURIComponent(alt)}`;
+                if (dataObject.isPolaroid) {
+                    url += '&isPolaroid=true';
+                    if (date) { // Check if date is not null or undefined before encoding
+                        url += `&date=${encodeURIComponent(date)}`;
+                    }
+                }
+                return url;
+            }
+            // It's good practice to have a default return for other cases or if conditions aren't met
+            // console.warn(`routeDataToUrl: Unhandled type '${type}' or missing dataObject. Returning home.`, dataObject);
+            return '/'; // Default to home or an appropriate fallback
         },
         loadPage(type, id) {
             const new_url = this.routeDataToUrl(type, id)
@@ -400,106 +320,18 @@ export default {
 
 
         openImageDialog(imageUrl, altText) {
-            this.selectedImageUrl = imageUrl;
-            this.selectedImageAlt = altText;
-            this.selectedPolaroidData = null;
-            this.dialogContentType = 'image';
-            this.imageDialogVisible = true;
-        },
-
-        getPrettyDate(date){
-            const options = {
-                day: 'numeric',
-                month: 'short',
-                year: '2-digit',
+            const imageData = {
+                imageUrl: imageUrl,
+                altText: altText,
+                isPolaroid: false,
+                polaroidDate: null
             };
-
-            return date.toLocaleDateString('en-US', options);
-        },
-        getProjectImageUrl(projectId, imageFilename) {
-            if (!projectId || !imageFilename) {
-                // console.warn('Missing projectId or imageFilename for getProjectImageUrl');
-                return '';
-                // Return empty or a placeholder image URL
-            }
-            try {
-                // Path relative from src/views/HomeView.vue to src/assets/projects/
-                return new URL(`../assets/projects/${projectId}/${imageFilename}`, import.meta.url).href;
-            } catch (e) {
-                console.error(`Error creating image URL for project '${projectId}', image '${imageFilename}':`, e);
-                return '';
-                // Return empty or a placeholder image URL
+            const new_url = this.routeDataToUrl('image', imageData);
+            if (new_url) {
+                this.route_history.push(new_url);
             }
         },
-        getProjectPdfUrl(projectId, pdfFilename) {
-            if (!projectId || !pdfFilename) {
-                return '';
-            }
-            try {
-                return new URL(`../assets/projects/${projectId}/${pdfFilename}`, import.meta.url).href;
-            } catch (e) {
-                console.error(`Error creating PDF URL for project '${projectId}', PDF '${pdfFilename}':`, e);
-                return '';
-            }
-        },
-        getTruncatedDescription(description, maxLength = 120) {
-            if (!description || typeof description !== 'string') return '';
-            // Basic stripping of markdown for length calculation and display
-            let plainText = description
-                .replace(/\{\{.*?\}\}/g, '')
-                // Remove image placeholders
-                .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-                // Replace links with their text
-                .replace(/[*_`~#\-+\.\!]/g, '');
-                // Remove other markdown chars, list markers
 
-            plainText = plainText.replace(/\s+/g, ' ').trim();
-            // Normalize whitespace
-
-            if (plainText.length <= maxLength) {
-                return plainText;
-            }
-            let truncated = plainText.substring(0, maxLength);
-            // Try to end on a word
-            const lastSpace = truncated.lastIndexOf(' ');
-            if (lastSpace > 0) {
-                truncated = truncated.substring(0, lastSpace);
-            }
-            return truncated + '...';
-        },
-        processProjectContent(content, projectId) {
-            if (!content || typeof content !== 'string') return '';
-            
-            let htmlContent = '';
-            try {
-                // Configure marked to add classes or use a renderer if needed for more complex styling
-                htmlContent = marked(content);
-            } catch (e) {
-                console.error('Error parsing markdown:', e);
-                // Fallback content
-                htmlContent = `<p>Error rendering content.</p>`;
-            }
-
-            // Replace {{image_name.ext}} placeholders
-            return htmlContent.replace(/\{\{(.*?)\}\}/g, (match, imageNameWithExt) => {
-                const imageName = imageNameWithExt.trim();
-                if (!imageName) return match;
-
-                try {
-                    const imageUrl = this.getProjectImageUrl(projectId, imageName);
-                    // Image '${imageName}' could not be resolved
-                    if (!imageUrl) return `<!-- Image '${imageName}' could not be resolved -->`;
-                    
-                    const altText = imageName.substring(0, imageName.lastIndexOf('.')).replace(/[_-]/g, ' ');
-                    return `<img src="${imageUrl}" alt="${altText}" style="max-width: 100%; height: auto; display: block; margin: 10px auto; border-radius: 8px; border: 1px solid #ddd;">`;
-                } catch (e) {
-                    // This catch might be redundant if getProjectImageUrl handles its own errors
-                    console.error(`Error processing image placeholder for project ${projectId}: ${imageName}`, e);
-                    // Error processing image '${imageName}'
-                    return `<!-- Error processing image '${imageName}' -->`;
-                }
-            });
-        },
     },
     watch:{
         route_history: {
@@ -542,7 +374,7 @@ export default {
         
         const route_data = this.getRouteData(this.$route.fullPath)
         if(route_data) {
-            const new_url = this.routeDataToUrl(route_data.type, route_data.id)
+            const new_url = this.routeDataToUrl(route_data.type, route_data)
             this.route_history.push(new_url)
         } else {
             this.route_history = []
@@ -557,13 +389,31 @@ export default {
         // shown_projects update after projects load removed, handled in ProjectsSection.vue via watcher
 
         this.update_homegrid++
-        console.log(this.homegrid_height)
+        // console.log(this.homegrid_height)
 
     },
 };
 </script>
 
 <style scoped>
+.home-view-wrapper {
+  position: relative;
+}
+
+.wood-texture-background {
+  position: absolute;
+  pointer-events: all;
+}
+
+.home-grid-container {
+  position: absolute;
+  min-height: 100vh;
+}
+
+
+
+
+/* Styles for PowerGlitch */
 .glitch-text:hover{
     animation: glitch-color 0.4s ease-in-out;
 }
@@ -584,75 +434,15 @@ export default {
         color: transparent;
         background-clip: text;
     }
-    100%
-     {background-image: unset;
+    100% {
+        background-image: unset;
         color: white;
         background-clip: unset;
     }
 }
 
-.project-card {
-    transition: all 0.3s;
 
-}
-.project-card:hover{
-    transform: scale(1.02);
-    -webkit-box-shadow: 7px 8px 18px 4px rgba(0,0,0,0.48);
-    -moz-box-shadow: 7px 8px 18px 4px rgba(0,0,0,0.48);
-    box-shadow: 7px 8px 18px 4px rgba(0,0,0,0.48);
-    z-index: 3
-}
-.post-it {
-
-    /* Fixed height */
-    max-height: 200px;
-    max-width: 200px;
-    font-size: clamp(0.8rem, 0.5vw, 2rem);
-    /* Added padding for content */
-    padding: 10px;
-    /* Hide overflowing content */
-    overflow: hidden;
-    /* Using flex to help with content alignment */
-    display: flex;
-    /* Stack title and description vertically */
-    flex-direction: column;
-    
-
-}
-.truncate-multi-line {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    line-clamp: 2;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-
-}
-
-.post-it h2 {
-    /* Space between title and description */
-    margin-bottom: 5px;
-    /* Prevent title from shrinking */
-    flex-shrink: 0;
-}
-
-/* Target the div rendering markdown */
-.post-it div[v-html] {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    line-clamp: 6;
-    /* Adjust number of lines visible */
-    -webkit-line-clamp: 6;
-    -webkit-box-orient: vertical;
-    /* Allow description to take available space */
-    flex-grow: 1;
-    /* Adjust line height for better fit */
-    line-height: 1.2em;
-    /* Fallback for non-webkit browsers, matches line-clamp */
-    max-height: calc(1.2em * 6);
-}
-
+/* Styles for v-html content (e.g., project descriptions) */
 :deep(ol) {
   margin-left: 20px !important;
 }

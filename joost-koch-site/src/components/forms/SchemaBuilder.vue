@@ -33,15 +33,14 @@ export default {
     },
     emits: ['update:modelValue'],
     setup(props, {emit}){
-        // const nestedFields = ref(props.modelValue) //removed
+        // const nestedFields = ref(props.modelValue)
+        //removed
         const addNestedField = () => {
             const newNested = { field: '', type: 'string', properties: [], items:null, showNested: false }
-            // nestedFields.value.push(newNested)
-              emit('update:modelValue', [...props.modelValue, newNested]);
+            emit('update:modelValue', [...props.modelValue, newNested]);
         };
 
         const removeNestedField = (index) => {
-            // nestedFields.value.splice(index, 1);
             const updatedValue = [...props.modelValue];
             updatedValue.splice(index, 1);
             emit('update:modelValue', updatedValue);
