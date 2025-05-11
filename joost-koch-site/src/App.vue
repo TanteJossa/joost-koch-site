@@ -5,11 +5,9 @@ v-app
 </template>
 
 <script>
-// Data 
-
+// Data
 
 // Components
-
 
 export default {
     name: 'App',
@@ -50,19 +48,26 @@ export default {
     
 <style>
 @font-face {
-  font-family: 'DankMono'; /* Choose a name for your font */
-  src: url('@/assets/fonts/DankMono-Regular.otf') format('opentype'); /* Path to your font file */
-  font-weight: normal; /* Optional: Define font weight (e.g., bold, normal, 400, 700) */
-  font-style: normal; /* Optional: Define font style (e.g., italic, normal) */
-  font-display: swap; /* Optional: Control font loading behavior */
+  font-family: 'DankMono';
+  /* Choose a name for your font */
+  src: url('@/assets/fonts/DankMono-Regular.otf') format('opentype');
+  /* Path to your font file */
+  font-weight: normal;
+  /* Optional: Define font weight (e.g., bold, normal, 400, 700) */
+  font-style: normal;
+  /* Optional: Define font style (e.g., italic, normal) */
+  font-display: swap;
+  /* Optional: Control font loading behavior */
 }
-/* @font-face {
+/* 
+@font-face {
   font-family: 'DankMono';
   src: url('@/assets/fonts/DankMono-Italic.otf') format('opentype');
   font-weight: normal;
   font-style: italic;
   font-display: swap;
-} */
+} 
+*/
 @font-face {
   font-family: 'DankMono';
   src: url('@/assets/fonts/AmazoneBt-Regular.ttf') format('truetype');
@@ -101,8 +106,10 @@ h1, h2, h3, h4, p{
 }
  
 /* Track */
-/* ::-webkit-scrollbar-track {
-} */
+/* 
+::-webkit-scrollbar-track {
+} 
+*/
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
@@ -111,10 +118,6 @@ h1, h2, h3, h4, p{
     background: #646464;
     border-radius: 6px;
 }
-
-
-
-
 
 .hover-shadow, .shadow {
     -webkit-box-shadow: 2px 3px 3px 1px rgba(0,0,0,0.75);

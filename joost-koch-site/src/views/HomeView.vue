@@ -1,193 +1,26 @@
 <template lang="pug">
     div.w-100(style="position: relative; ")
         
-        WoodTexture(style="position:absolute; pointer-events: all;" ref="woodTexture" :canvasHeight="homegrid_height")
+        WoodTextureBackground(style="position:absolute; pointer-events: all;" ref="woodTexture" :canvasHeight="homegrid_height")
         div.w-100#home-grid(
             style="position: absolute; min-height: 100vh"
             @mousemove="woodMouseMove"
         )   
             HomeGrid
                 template(#name)
-                    div.h-100.d-flex.align-center.justify-center(style="text-align: center;")
-
-                        h1(
-                            style="font-size: calc(min(100vw, 600px) / 5); display: inline-block;"
-                            @click="is_moving_wood = !is_moving_wood"
-                        )
-                            | J
-                            Eyes
-                            | st K{{is_moving_wood ? '●' : 'o' }}ch
+                    NameSection
                 template(#div1)
-
-                    div.ml-6.mt-9(
-                        :style="{'transform': 'rotate('+(projects_text_rotation)+'deg)', 'display': 'inline-block'}"
-
+                    ProjectsSection(
+                        :projects="projects"
+                        @open-projects-view="handleOpenProjectsView"
+                        @open-project-details="handleOpenProjectDetails"
                     )
-                        div(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
-                            MulticoloredText(
-                                text="Projecten"
-                                is_clickable
-                                @click="openProjects"
-                            )
-
-
-
-                    div.ml-3.d-flex.flex-row#projects(ref="projects" @resize="shown_projects = shownProjects()")
-                        PostIt.ml-3.post-it(
-                            v-for="(project, index) in shown_projects"
-                            @mouseover="project_hover_index = index"
-                            @mouseleave="project_hover_index = -1"
-                            is_clickable
-                            @click="openProject(project.id)"
-                            :style="{'z-index': project_hover_index == index ? '10 !important' : 0}"
-                        )
-                            h2 {{project.title}}
-                            div.truncate-multi-line(v-html="processProjectContent(project.description, project.id)")
                 template(#div2 )
-                    div.w-100(style="position: relative; min-height: 350px")
-
-                        div.w-100.d-flex.flex-wrap#photo-container(
-                            style="position: absolute; top: 0; left: 0; "
-                        )
-                            PolaroidPhoto(
-                                v-for="(image, index) in shown_images"
-                                @mouseover="image_hover_index = index"
-                                @mouseleave="image_hover_index = -1"
-                                @polaroid-click="openPolaroidDialog"
-                                :style="{'transform': 'rotate('+image.rotation+'deg)', 'max-width': '250px', 'height': 'calc('+(250) + 'px' + (index < 2 ? ' - 50px)' : ')'), top:  'calc('+( image.top ) + '%' + (index < 2 ? ' +  90px)' : ')'), position: 'absolute', left: index * (90) / shown_images.length  + '%', 'z-index': image_hover_index == index ? '10 !important' : image.z_index}"
-                                :image="image.imageUrl"
-                                :date="image.date ? image.date : undefined"
-                            )
-                        div.ml-6(
-                            :style="{'transform': 'rotate('+(images_text_rotation)+'deg)', 'display': 'inline-block', 'position': 'absolute'}"
-
-                        )
-                            div(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
-                                MulticoloredText(
-                                    text="Foto's"
-                                    is_clickable
-                                    @click="loadRandomImages()"
-                                )
+                    PhotosSection(@show-polaroid-dialog="openPolaroidDialog")
                 template(#div3)
-                    div.pl-6.w-100(
-                        :style="{'transform': 'rotate('+(media_text_rotation)+'deg)', 'display': 'inline-block'}"
-
-                    )
-                        div(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
-                            MulticoloredText(
-                                text="Media"
-                                is_clickable
-                                @click="loadMedia"
-                            )
-                        v-radio-group(
-                            v-model="media_type"
-                            inline
-                        )
-                            v-radio(
-                                value="movies"
-                                label="Films"
-                            )
-                            v-radio(
-                                value="series"
-                                label="Series"
-                            )
-                        v-checkbox(
-                            v-model="media_is_sorted"
-                            label="Sorteer"
-                            @update:modelValue="loadMedia"
-                            :disabled="loading_media"
-                        
-                        )
-                        div.w-100(style="overflow-y: scroll; color: white; font-family: 'CreamyChalk'")
-                            table.w-100(v-if="media_type == 'movies' && movies.length > 0")
-                                thead
-                                    tr
-                                        th Naam
-                                        th.text-right Score
-                                tbody
-                                    tr(v-for="movie in movies")
-                                        td {{ movie.B }}
-                                        td.text-right {{ movie.C }}
-                            table.w-100(v-if="media_type == 'series' && series.length > 0")
-                                thead
-                                    tr
-                                        th Naam
-                                        th Seizoen
-                                        th.text-right Score
-                                tbody
-                                    tr(v-for="serie in series")
-                                        td {{ serie.B }}
-                                        td.text-center {{ serie.C }}
-                                        td.text-right {{ serie.D }}
-                            v-btn.mt-2(
-                                text="Meer"
-                                color="secondary"  
-                                @click="loadExtraMedia"
-                                :loading="loading_media"
-                                variant="outlined"
-                             
-                            )
+                    MediaSection
                 template(#div4)
-                    div.pl-6
-                        div.ml-3(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
-                            MulticoloredText(
-                                text="Links"
-                            )
-                        //- div.ma-2(style="height: 80px; overflow-y: hidden; border-radius: 13px")
-                            iframe(
-                                style="border-radius:12px", 
-                                src="https://open.spotify.com/embed/track/7qGoMOzR9pJ1bPl4bFmTN7?utm_source=generator", 
-                                width="100%", height="120px", 
-                                frameborder="0", 
-                                allowfullscreen, 
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
-                                loading="lazy"
-                            )         
-      
-                        div.ma-2.mb-0(style="overflow-y: hidden; border-radius: 13px")
-                            iframe(
-                                style="border-radius:12px", 
-                                src="https://open.spotify.com/embed/playlist/5C43gmwC8gamonutCtNTn5?utm_source=generator", 
-                                width="100%", 
-                                height="152", 
-                                frameborder="0", 
-                                allowfullscreen, 
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
-                                loading="lazy"
-                            )
-
-                        div.mb-3.ml-3.d-flex.justify-start.flex-wrap
-                        
-                            v-icon.hover-shadow(
-                                style="font-size: 50px"
-                                icon="mdi-github"
-                                @click="open('https://github.com/TanteJossa')"
-                            )
-                            v-icon.ml-2.hover-shadow(
-                                style="font-size: 50px"
-                                icon="mdi-instagram"
-                                @click="open('https://www.instagram.com/joostkoch/')"
-                            )
-                            v-icon.ml-2.hover-shadow(
-                                style="font-size: 50px"
-                                icon="mdi-linkedin"
-                                @click="open('https://www.linkedin.com/in/joost-koch-a299aa269/')"
-                            )
-                            v-icon.ml-2.hover-shadow(
-                                style="font-size: 50px"
-                                icon="mdi-spotify"
-                                @click="open('https://open.spotify.com/user/q1v0gsdavetx3m2k1jm472nhx?si=5d330fcfbc3046e6')"
-                            )
-                            v-img.ml-2.hover-shadow(
-                                style="font-size: 50px; max-width: 40px; height: 50px; color: white"
-                                src="@/assets/Bluesky_Logo.svg"
-                                @click="open('https://bsky.app/profile/joost-koch.nl')"
-                            )
-                            v-icon.ml-2.hover-shadow(
-                                style="font-size: 50px"
-                                icon="mdi-twitter"
-                                @click="open('https://x.com/TanteJossa')"
-                            )
+                    LinksSection
                 template(#div5)
                     div
 
@@ -349,15 +182,17 @@
 </template>
 
 <script>
-import Eyes from '@/components/Eyes.vue';
-import WoodTexture from '@/components/WoodTexture.vue';
+import NameSection from '@/components/home_page/name_section/NameSection.vue';
+import WoodTextureBackground from '@/components/home_page/background/WoodTextureBackground.vue';
 import { PowerGlitch } from 'powerglitch'
-import PostIt from '@/components/PostIt.vue'; // Adjust path as needed
-import MulticoloredText from '@/components/MulticoloredText.vue';
-import HomeGrid from '@/components/HomeGrid.vue';
+// Adjust path as needed
+import HomeGrid from '@/components/home_page/layout/HomeGrid.vue';
+import ProjectsSection from '@/components/home_page/projects_section/ProjectsSection.vue';
+import PhotosSection from '@/components/home_page/photos_section/PhotosSection.vue';
+import MediaSection from '@/components/home_page/media_section/MediaSection.vue';
+import LinksSection from '@/components/home_page/links_section/LinksSection.vue';
 import { v4 as uuidv4 } from 'uuid';
 import { getUniqueIntegers, extractDateFromFilename } from '../helpers';
-import PolaroidPhoto from '@/components/PolaroidPhoto.vue';
 import projectsData from '../assets/projects.json';
 import { marked } from 'marked';
 
@@ -365,12 +200,13 @@ import { marked } from 'marked';
 export default {
     name: 'TestView',
     components: {
-        Eyes,
-        WoodTexture,
-        PostIt,
-        MulticoloredText,
+        NameSection,
+        WoodTextureBackground,
         HomeGrid,
-        PolaroidPhoto
+        ProjectsSection,
+        PhotosSection,
+        MediaSection,
+        LinksSection
     },
     setup(){
 
@@ -381,28 +217,15 @@ export default {
     data() {
         return {
             update_homegrid: 0,
-            is_moving_wood: false,
-            project_hover_index: -1,
-            shown_projects: [],
             route_history: [],
             
             projects: [], // Initialize projects as an empty array
 
             project_search: "",
             project_sort: "Rank",
+            
 
-            images: [],
-            image_hover_index:-1,
-            images_text_rotation: (Math.random() * 15 - 7.5) * 0,
-            projects_text_rotation: (Math.random() * 15 - 7.5) * 0,
-            media_text_rotation: (Math.random() * 10 - 5) * 0,
-
-            media_type: Math.random() > 0.5 ? 'series' : 'movies',
-
-            media_is_sorted: false,
-            series: [],
-            movies: [],
-            loading_media: false,
+            // projects_text_rotation removed
 
 
             imageDialogVisible: false,
@@ -451,13 +274,6 @@ export default {
 
             return this.projects.filter(e => e.title.toLowerCase().includes(this.project_search.toLowerCase())).sort((a,b) => sort_method(a,b))
         },
-        shown_images(){
-            const container = document.getElementById('photo-container')
-            if (!container){
-                return this.images
-            }
-            return this.images.slice(0, Math.round(container.clientWidth / 220))
-        },
         homegrid_height(){
             this.update_homegrid-=1
             const el = document.getElementById('home-grid')
@@ -486,16 +302,12 @@ export default {
             }
 
         },
-        shownProjects(){
-            if (!this.projects || this.projects.length === 0) {
-                return [];
-            }
-            const projects_container = this.$refs.projects;
-            if (!projects_container) {
-                return [];
-            }
-            const box = projects_container.getBoundingClientRect();
-            return this.projects.slice(0, Math.floor(box.width / 220) * (this.$vuetify.display.lgAndUp ? 2 : 1));
+        // shownProjects method removed as it's now in ProjectsSection.vue
+        handleOpenProjectsView() {
+            this.route_history.push(this.routeDataToUrl('projects'));
+        },
+        handleOpenProjectDetails(id) {
+            this.route_history.push(this.routeDataToUrl('projects', id));
         },
         overlayGoBack(){
             this.overlay_type = {
@@ -538,7 +350,8 @@ export default {
         },
         goBack() {
             if (this.route_history.length === 0) {
-                return; // Nothing to go back to
+                return;
+            // Nothing to go back to
             }
 
             const currentRoutePath = this.route_history[this.route_history.length - 1];
@@ -576,12 +389,8 @@ export default {
         },
 
 
-        openProjects(){
-            this.route_history.push(this.routeDataToUrl('projects'))
-        },
-        openProject(id){
-            this.route_history.push(this.routeDataToUrl('projects', id))
-        },
+        // openProjects method removed, handled by handleOpenProjectsView
+        // openProject method removed, handled by handleOpenProjectDetails
         getProjectFromId(id){
             if (!this.projects || this.projects.length === 0) {
                 return {};
@@ -610,14 +419,16 @@ export default {
         getProjectImageUrl(projectId, imageFilename) {
             if (!projectId || !imageFilename) {
                 // console.warn('Missing projectId or imageFilename for getProjectImageUrl');
-                return ''; // Return empty or a placeholder image URL
+                return '';
+                // Return empty or a placeholder image URL
             }
             try {
                 // Path relative from src/views/HomeView.vue to src/assets/projects/
                 return new URL(`../assets/projects/${projectId}/${imageFilename}`, import.meta.url).href;
             } catch (e) {
                 console.error(`Error creating image URL for project '${projectId}', image '${imageFilename}':`, e);
-                return ''; // Return empty or a placeholder image URL
+                return '';
+                // Return empty or a placeholder image URL
             }
         },
         getProjectPdfUrl(projectId, pdfFilename) {
@@ -635,11 +446,15 @@ export default {
             if (!description || typeof description !== 'string') return '';
             // Basic stripping of markdown for length calculation and display
             let plainText = description
-                .replace(/\{\{.*?\}\}/g, '') // Remove image placeholders
-                .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Replace links with their text
-                .replace(/[*_`~#\-+\.\!]/g, ''); // Remove other markdown chars, list markers
+                .replace(/\{\{.*?\}\}/g, '')
+                // Remove image placeholders
+                .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+                // Replace links with their text
+                .replace(/[*_`~#\-+\.\!]/g, '');
+                // Remove other markdown chars, list markers
 
-            plainText = plainText.replace(/\s+/g, ' ').trim(); // Normalize whitespace
+            plainText = plainText.replace(/\s+/g, ' ').trim();
+            // Normalize whitespace
 
             if (plainText.length <= maxLength) {
                 return plainText;
@@ -652,9 +467,6 @@ export default {
             }
             return truncated + '...';
         },
-        open(url){
-            window.open(url, '_blank')
-        },
         processProjectContent(content, projectId) {
             if (!content || typeof content !== 'string') return '';
             
@@ -664,7 +476,8 @@ export default {
                 htmlContent = marked(content);
             } catch (e) {
                 console.error('Error parsing markdown:', e);
-                htmlContent = `<p>Error rendering content.</p>`; // Fallback content
+                // Fallback content
+                htmlContent = `<p>Error rendering content.</p>`;
             }
 
             // Replace {{image_name.ext}} placeholders
@@ -674,6 +487,7 @@ export default {
 
                 try {
                     const imageUrl = this.getProjectImageUrl(projectId, imageName);
+                    // Image '${imageName}' could not be resolved
                     if (!imageUrl) return `<!-- Image '${imageName}' could not be resolved -->`;
                     
                     const altText = imageName.substring(0, imageName.lastIndexOf('.')).replace(/[_-]/g, ' ');
@@ -681,98 +495,11 @@ export default {
                 } catch (e) {
                     // This catch might be redundant if getProjectImageUrl handles its own errors
                     console.error(`Error processing image placeholder for project ${projectId}: ${imageName}`, e);
+                    // Error processing image '${imageName}'
                     return `<!-- Error processing image '${imageName}' -->`;
                 }
             });
         },
-        async loadRandomImages(){
-            const ids = getUniqueIntegers(5, 1, 62);
-            const imageModules = import.meta.glob('@/assets/luft/*.png', {as: 'url', eager: true });
-            const imageList = Object.entries(imageModules).map(([path]) => ({
-                filename: path.split('/').pop(),
-                url: imageModules[path], // Directly use the URL
-            }));
-            console.log(imageList)
-            this.images = []
-            await Promise.all(
-                ids.map(async (index) => {
-                    if (index >= imageList.length){
-                        return null
-                    }
-                    const { filename, url } = imageList[index];
-
-                    try {
-                        // const module = await import(/* @vite-ignore */ `${url}`);
-                        // const imageUrl = module.default;
-
-                        // Extract date from filename (IMG_YYYYMMDD_...)
-                        const dateMatch = filename.match(/IMG_(\d{8})_/);
-                        let dateObj = null;
-                        if (dateMatch) {
-                            const dateString = dateMatch[1];
-                            const year = parseInt(dateString.slice(0, 4));
-                            const month = parseInt(dateString.slice(4, 6)) - 1; // Month is 0-indexed
-                            const day = parseInt(dateString.slice(6, 8));
-                            dateObj = new Date(year, month, day);
-                        }
-
-                        this.images.push({
-                            imageUrl: url,
-                            date: dateObj,
-                            top: Math.random() * 20,
-                            rotation: (40*Math.random() - 20),
-                            z_index: Math.round(Math.random() * 10).toString()
-                        })
-                    } catch (error) {
-                        console.error(`Error loading image ${filename}:`, error);
-                        return null;
-                    }
-                })
-            );
-            console.log(this.images)
-        },
-        async getSheetData(n, sheet='Series', start_index=0, is_sorted=false) {
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbznFPhD1jfyaPYukVEd8dMjcOW6oDUlM7rq4mf2Zer1KsC0txHwh7XuAGGx3NPKTsMG/exec'; // Replace with your deployed App Script URL
-            const params = new URLSearchParams({
-                n: n,
-                sheetName: sheet,
-                startIndex: is_sorted ? 3 + start_index : 3,
-                isSorted: is_sorted
-            });
-
-            try {
-                const response = await fetch(`${scriptURL}?${params}`);
-                const data = await response.json();
-                console.log(data)
-                return data;
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                return null;
-            }
-        },
-        async loadMedia(){
-            this.loading_media = true
-
-
-            const [serie_result, movie_result] = await Promise.all([this.getSheetData(5, "Series", 0, this.media_is_sorted), this.getSheetData(5, "Films", 0, this.media_is_sorted)])
-            this.series = serie_result
-            this.movies = movie_result
-            console.log(this.series, this.movies)
-            this.loading_media = false
-        
-            
-
-        },
-        async loadExtraMedia(){
-            this.loading_media = true
-            if (this.media_type == 'movies'){
-                this.movies = this.movies.concat(await this.getSheetData(10, "Films", this.movies.length, this.media_is_sorted))
-            } else {
-                this.series = this.series.concat(await this.getSheetData(10, "Series", this.series.length, this.media_is_sorted))
-            }
-            this.loading_media = false
-        
-        }
     },
     watch:{
         route_history: {
@@ -822,21 +549,12 @@ export default {
         }
 
 
-        const projects_container = this.$refs.projects;
-        if (projects_container) {
-            const observer = new ResizeObserver(() => {
-                this.shown_projects = this.shownProjects();
-
-                this.update_homegrid = true
-            });
-            observer.observe(projects_container);
-        }
+        // ResizeObserver for projects_container removed, handled in ProjectsSection.vue
         
         // Fetch all data first
-        await Promise.all([/*this.fetchProjects() removed*/ this.loadRandomImages(), this.loadMedia()]);
+        await Promise.all([]);
 
-        // Now that projects are loaded, update shown_projects
-        this.shown_projects = this.shownProjects();
+        // shown_projects update after projects load removed, handled in ProjectsSection.vue via watcher
 
         this.update_homegrid++
         console.log(this.homegrid_height)
@@ -886,41 +604,53 @@ export default {
 }
 .post-it {
 
-    max-height: 200px; /* Fixed height */
+    /* Fixed height */
+    max-height: 200px;
     max-width: 200px;
     font-size: clamp(0.8rem, 0.5vw, 2rem);
-    padding: 10px; /* Added padding for content */
-    overflow: hidden; /* Hide overflowing content */
-    display: flex; /* Using flex to help with content alignment */
-    flex-direction: column; /* Stack title and description vertically */
+    /* Added padding for content */
+    padding: 10px;
+    /* Hide overflowing content */
+    overflow: hidden;
+    /* Using flex to help with content alignment */
+    display: flex;
+    /* Stack title and description vertically */
+    flex-direction: column;
     
 
 }
 .truncate-multi-line {
-    overflow: hidden;         
-    text-overflow: ellipsis;  
-    display: -webkit-box;     
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
     line-clamp: 2;
-    -webkit-line-clamp: 2;    
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 
 }
 
 .post-it h2 {
-    margin-bottom: 5px; /* Space between title and description */
-    flex-shrink: 0; /* Prevent title from shrinking */
+    /* Space between title and description */
+    margin-bottom: 5px;
+    /* Prevent title from shrinking */
+    flex-shrink: 0;
 }
 
-.post-it div[v-html] { /* Target the div rendering markdown */
+/* Target the div rendering markdown */
+.post-it div[v-html] {
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     line-clamp: 6;
-    -webkit-line-clamp: 6; /* Adjust number of lines visible */
+    /* Adjust number of lines visible */
+    -webkit-line-clamp: 6;
     -webkit-box-orient: vertical;
-    flex-grow: 1; /* Allow description to take available space */
-    line-height: 1.2em; /* Adjust line height for better fit */
-    max-height: calc(1.2em * 6); /* Fallback for non-webkit browsers, matches line-clamp */
+    /* Allow description to take available space */
+    flex-grow: 1;
+    /* Adjust line height for better fit */
+    line-height: 1.2em;
+    /* Fallback for non-webkit browsers, matches line-clamp */
+    max-height: calc(1.2em * 6);
 }
 
 :deep(ol) {

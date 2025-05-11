@@ -40,18 +40,21 @@ export default {
             ctx.clearRect(0, 0, width, height);
 
             // Draw background
-            ctx.fillStyle = '#D2B48C'; // Light brown
+            // Light brown
+            ctx.fillStyle = '#D2B48C';
             ctx.fillRect(0, 0, width, height);
 
             // Draw dowels
-            ctx.strokeStyle = '#A0522D'; // Dark brown
+            // Dark brown
+            ctx.strokeStyle = '#A0522D';
             ctx.lineWidth = 2;
             this.dowels.forEach(({ x, y }) => {
                 ctx.fillRect(x,y,10,10)
             });
 
             // Draw grain lines
-            ctx.strokeStyle = '#8B4513'; // Medium brown
+            // Medium brown
+            ctx.strokeStyle = '#8B4513';
             ctx.lineWidth = 1;
             for (let y = 0; y < height; y += grainThickness) {
                 ctx.beginPath();

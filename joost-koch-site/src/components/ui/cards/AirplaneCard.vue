@@ -7,9 +7,7 @@ v-card
 <script>
 // Data 
 
-
 // Components
-
 
 export default {
     name: 'AirplaneCard',

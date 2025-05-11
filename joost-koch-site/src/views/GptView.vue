@@ -106,7 +106,7 @@ v-container(fluid)
 <script>
 import { ref, computed, watch, onMounted } from 'vue';
 import axios from 'axios';
-import SchemaBuilder from '@/components/SchemaBuilder.vue'; // Import the recursive component
+import SchemaBuilder from '@/components/forms/SchemaBuilder.vue'; // Import the recursive component
 
 export default {
     name: 'GptView',

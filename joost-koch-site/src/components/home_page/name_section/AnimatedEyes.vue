@@ -31,7 +31,7 @@ span(style="display: inline-flex; align-items: center")
 </template>
 
 <script>
-// Data 
+// Data
 
 
 // Components
