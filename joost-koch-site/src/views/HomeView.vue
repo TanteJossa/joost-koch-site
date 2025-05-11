@@ -158,9 +158,9 @@ export default {
         
     },
     methods: {
-            handleOpenImageDialogFromOverlay(imageUrl, altText) { // Changed signature
-                const finalImageUrl = imageUrl === undefined ? '' : imageUrl;
-                const finalAltText = altText === undefined ? 'Image' : altText; // Default to 'Image' if alt is undefined
+            handleOpenImageDialogFromOverlay(imageUrl, altText) {
+                const finalImageUrl = (imageUrl === undefined || imageUrl === null || imageUrl === 'undefined') ? '' : imageUrl;
+                const finalAltText = (altText === undefined || altText === null || altText === 'undefined') ? 'Image' : altText;
 
                 const imageData = {
                     imageUrl: finalImageUrl,
@@ -173,19 +173,40 @@ export default {
                     this.route_history.push(new_url);
                 }
             },
-        openPolaroidDialog(polaroidData) {
-            const altText = polaroidData.date ? `Polaroid from ${new Date(polaroidData.date).toLocaleDateString()}` : 'Polaroid Photo';
-            const imageData = {
-                imageUrl: polaroidData.image,
-                altText: altText,
-                isPolaroid: true,
-                polaroidDate: polaroidData.date ? (polaroidData.date instanceof Date ? polaroidData.date.toISOString() : new Date(polaroidData.date).toISOString()) : null // Ensure ISO string
-            };
-            const new_url = this.routeDataToUrl('image', imageData);
-            if (new_url) {
-                this.route_history.push(new_url);
-            }
-        },
+            openPolaroidDialog(polaroidData) {
+                const rawImageUrl = polaroidData && polaroidData.image;
+                const finalImageUrl = (rawImageUrl === undefined || rawImageUrl === null || rawImageUrl === 'undefined') ? '' : rawImageUrl;
+
+                let rawAltText;
+                if (polaroidData && polaroidData.date) {
+                    const dateObj = new Date(polaroidData.date);
+                    rawAltText = !isNaN(dateObj.getTime()) ? `Polaroid from ${dateObj.toLocaleDateString()}` : 'Polaroid Photo';
+                } else {
+                    rawAltText = 'Polaroid Photo';
+                }
+                const finalAltText = (rawAltText === undefined || rawAltText === null || rawAltText === 'undefined') ? 'Polaroid Photo' : rawAltText;
+                
+                let rawPolaroidDate = polaroidData && polaroidData.date ?
+                    (polaroidData.date instanceof Date ? polaroidData.date.toISOString() : new Date(polaroidData.date).toISOString())
+                    : null;
+                // Ensure rawPolaroidDate is not the string "undefined" if it resulted from an invalid date conversion that stringified to "undefined"
+                if (rawPolaroidDate === 'Invalid Date' || typeof rawPolaroidDate !== 'string' && rawPolaroidDate !== null) { // Check for "Invalid Date" string from bad toISOString() or if not string/null
+                     rawPolaroidDate = null;
+                }
+
+                const finalPolaroidDate = (rawPolaroidDate === undefined || rawPolaroidDate === null || rawPolaroidDate === 'undefined') ? null : rawPolaroidDate;
+
+                const imageData = {
+                    imageUrl: finalImageUrl,
+                    altText: finalAltText,
+                    isPolaroid: true,
+                    polaroidDate: finalPolaroidDate
+                };
+                const new_url = this.routeDataToUrl('image', imageData);
+                if (new_url) {
+                    this.route_history.push(new_url);
+                }
+            },
         woodMouseMove(event){
             const component = this.$refs.woodTexture;
             if (!component) return;
@@ -239,27 +260,37 @@ export default {
             }
             return route_data;
         },
-        routeDataToUrl(type, dataObject) { // Changed signature to dataObject
+        routeDataToUrl(type, dataObject) {
             if (type === 'projects') {
                 return '/projects' + (dataObject && dataObject.id ? '/' + dataObject.id : '');
             } else if (type === 'image' && dataObject) {
-                // Add robust checks for undefined before encodeURIComponent
-                const src = dataObject.imageUrl === undefined ? '' : dataObject.imageUrl;
-                const alt = dataObject.altText === undefined ? 'Image' : dataObject.altText; // Default to 'Image'
-                const date = dataObject.polaroidDate === undefined ? null : dataObject.polaroidDate;
+                const imageUrlInput = dataObject.imageUrl;
+                const altTextInput = dataObject.altText;
+                const dateInput = dataObject.polaroidDate; // This should be an ISO string or null from imageData
 
-                let url = `/image-viewer?src=${encodeURIComponent(src)}&alt=${encodeURIComponent(alt)}`;
+                // Critical: Ensure these checks handle the string "undefined"
+                const safeImageUrl = (imageUrlInput === undefined || imageUrlInput === null || imageUrlInput === 'undefined')
+                                    ? ''
+                                    : imageUrlInput;
+                const safeAltText = (altTextInput === undefined || altTextInput === null || altTextInput === 'undefined')
+                                   ? 'Image'
+                                   : altTextInput;
+                // For date, null is a valid state meaning "no date". The string "undefined" should become null.
+                const safeDate = (dateInput === undefined || dateInput === 'undefined')
+                                 ? null
+                                 : dateInput; // Allows null to pass through
+
+                let url = `/image-viewer?src=${encodeURIComponent(safeImageUrl)}&alt=${encodeURIComponent(safeAltText)}`;
+                
                 if (dataObject.isPolaroid) {
                     url += '&isPolaroid=true';
-                    if (date) { // Check if date is not null or undefined before encoding
-                        url += `&date=${encodeURIComponent(date)}`;
+                    if (safeDate) { // Only add date param if safeDate is a truthy string (not null)
+                        url += `&date=${encodeURIComponent(safeDate)}`;
                     }
                 }
                 return url;
             }
-            // It's good practice to have a default return for other cases or if conditions aren't met
-            // console.warn(`routeDataToUrl: Unhandled type '${type}' or missing dataObject. Returning home.`, dataObject);
-            return '/'; // Default to home or an appropriate fallback
+            return '/';
         },
         loadPage(type, id) {
             const new_url = this.routeDataToUrl(type, id)
@@ -319,18 +350,21 @@ export default {
         },
 
 
-        openImageDialog(imageUrl, altText) {
-            const imageData = {
-                imageUrl: imageUrl,
-                altText: altText,
-                isPolaroid: false,
-                polaroidDate: null
-            };
-            const new_url = this.routeDataToUrl('image', imageData);
-            if (new_url) {
-                this.route_history.push(new_url);
-            }
-        },
+            openImageDialog(imageUrl, altText) {
+                const finalImageUrl = (imageUrl === undefined || imageUrl === null || imageUrl === 'undefined') ? '' : imageUrl;
+                const finalAltText = (altText === undefined || altText === null || altText === 'undefined') ? 'Image' : altText;
+
+                const imageData = {
+                    imageUrl: finalImageUrl,
+                    altText: finalAltText,
+                    isPolaroid: false,
+                    polaroidDate: null
+                };
+                const new_url = this.routeDataToUrl('image', imageData);
+                if (new_url) {
+                    this.route_history.push(new_url);
+                }
+            },
 
     },
     watch:{

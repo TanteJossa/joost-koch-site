@@ -62,7 +62,7 @@ export default {
 .md-up {
   display: grid;
   grid-template-columns: 1fr min(700px, 100vw) 1fr;
-  grid-template-rows: 1fr 180px 1fr;
+  grid-template-rows: 1fr 160px 1fr;
 }
 
 .md-up .grid-area-one { grid-area: 1 / 1 / 1 / 3; }

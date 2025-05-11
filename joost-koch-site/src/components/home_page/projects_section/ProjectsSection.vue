@@ -179,7 +179,7 @@ export default {
     /* Add any necessary styling for the container itself, e.g., to ensure it has width */
     width: 100%; 
     /* Or other appropriate width management */
-    min-height: 220px;
+    /* min-height: 180px; */
     /* Ensure it has some height for observer */
 }
 </style>
