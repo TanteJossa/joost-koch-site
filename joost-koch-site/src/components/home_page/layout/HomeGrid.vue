@@ -1,5 +1,5 @@
 <template lang="pug">
-.parent-grid(:class="{'md-up': $vuetify.display.lgAndUp}")
+.parent-grid(:class="{'md-up': $vuetify.display.mdAndUp}")
     .grid-area-one
         slot(name="div1")
             p div1
@@ -15,9 +15,9 @@
     .grid-area-four
         slot(name="div4")
             p div4
-    //- .grid-area-five
-        //- slot(name="div5")
-            //- p div5
+    .grid-area-five
+        slot(name="div5")
+            p div5
 </template>
 
 <script>
@@ -70,6 +70,6 @@ export default {
 .md-up .grid-area-two { grid-area: 3 / 1 / 3 / 3; }
 .md-up .grid-area-three { grid-area: 1 / 3 / 3 / 3; }
 .md-up .grid-area-four { grid-area: 3 / 3 / 3 / 3; }
-/* .md-up .grid-area-five { grid-area: 3 / 2 / 4 / 3; } */
+.md-up .grid-area-five { grid-area: 2 / 1 / 2 / 1; }
 
 </style>

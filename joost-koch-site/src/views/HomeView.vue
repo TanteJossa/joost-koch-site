@@ -1,6 +1,6 @@
 <template lang="pug">
 div.w-100.home-view-wrapper
-    
+
     WoodTextureBackground.wood-texture-background(ref="woodTexture" :canvasHeight="homegrid_height" )
     div.w-100#home-grid.home-grid-container(
         @mousemove="woodMouseMove"
@@ -23,7 +23,13 @@ div.w-100.home-view-wrapper
             template(#div4)
                 LinksSection
             template(#div5)
-                div
+
+                    MulticoloredText.pl-6.links-title-text(
+                        text="CV"
+                        target="_blank"
+                        @click="openCv()"
+                    )
+
 RouteDrivenOverlay(
         :richRouteHistory="richRouteHistory"
         :projects="projects"
@@ -65,7 +71,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getUniqueIntegers, extractDateFromFilename } from '../helpers';
 import projectsData from '../assets/projects.json';
 import { marked } from 'marked';
-
+import cv from '@/assets/pdfs/cv.pdf'
 
 export default {
     name: 'TestView',
@@ -83,19 +89,20 @@ export default {
     setup(){
 
         return {
-            PowerGlitch
+            PowerGlitch,
+            cv
         }
     },
     data() {
         return {
             update_homegrid: 0,
             route_history: [],
-            
+
             projects: [], // Initialize projects as an empty array
 
             project_search: "",
             project_sort: "Rank",
-            
+
 
             // projects_text_rotation removed
             imageDialogVisible: false,
@@ -142,7 +149,7 @@ export default {
                 } else {
                     rich_route_data.title = 'Detail'; // Default title
                 }
-                
+
                 return rich_route_data;
             });
         },
@@ -154,8 +161,11 @@ export default {
                 return el.clientHeight + 'px'
             }
             return '100vh'
+        },
+        cv_url(){
+          return window.location.origin + cv
         }
-        
+
     },
     methods: {
             handleOpenImageDialogFromOverlay(imageUrl, altText) {
@@ -185,7 +195,7 @@ export default {
                     rawAltText = 'Polaroid Photo';
                 }
                 const finalAltText = (rawAltText === undefined || rawAltText === null || rawAltText === 'undefined') ? 'Polaroid Photo' : rawAltText;
-                
+
                 let rawPolaroidDate = polaroidData && polaroidData.date ?
                     (polaroidData.date instanceof Date ? polaroidData.date.toISOString() : new Date(polaroidData.date).toISOString())
                     : null;
@@ -211,7 +221,7 @@ export default {
             const component = this.$refs.woodTexture;
             if (!component) return;
             if (this.is_moving_wood){
-                
+
             component.$el.dispatchEvent(new MouseEvent("mousemove" ,event))
             }
 
@@ -281,7 +291,7 @@ export default {
                                  : dateInput; // Allows null to pass through
 
                 let url = `/image-viewer?src=${encodeURIComponent(safeImageUrl)}&alt=${encodeURIComponent(safeAltText)}`;
-                
+
                 if (dataObject.isPolaroid) {
                     url += '&isPolaroid=true';
                     if (safeDate) { // Only add date param if safeDate is a truthy string (not null)
@@ -311,7 +321,7 @@ export default {
             // Check if the current view is a single project detail page
             if (routeData && routeData.type === 'projects' && routeData.id) {
                 const projectBrowserUrl = this.routeDataToUrl('projects');
-                
+
                 // Remove the current project detail page from history
                 this.route_history.pop();
 
@@ -365,6 +375,10 @@ export default {
                     this.route_history.push(new_url);
                 }
             },
+            openCv(){
+                window.open(this.cv_url, '_blank');
+            },
+
 
     },
     watch:{
@@ -400,12 +414,12 @@ export default {
                 "amplitudeX": 0.08,
                 "amplitudeY": 0.08
             },
-            
+
             playMode: 'hover',
-            
+
         })
 
-        
+
         const route_data = this.getRouteData(this.$route.fullPath)
         if(route_data) {
             const new_url = this.routeDataToUrl(route_data.type, route_data)
@@ -416,7 +430,7 @@ export default {
 
 
         // ResizeObserver for projects_container removed, handled in ProjectsSection.vue
-        
+
         // Fetch all data first
         await Promise.all([]);
 
@@ -430,6 +444,11 @@ export default {
 </script>
 
 <style scoped>
+.links-title-text {
+  font-family: 'CreamyChalk';
+  font-size: calc(min(100vw, 600px) / 10);
+}
+
 .home-view-wrapper {
   position: relative;
 }

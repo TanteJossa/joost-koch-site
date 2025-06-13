@@ -8,24 +8,24 @@ div.h-100.pa-4.project-detail-scroll(v-if="project")
             v-icon(icon="mdi-open-in-new")
         v-btn(v-if="project.github" :href="project.github" target="_blank" icon variant="text" density="compact")
             v-icon(icon="mdi-github")
-    
+
     p.text-caption.text-grey-darken-1
         span(v-if="project.date") {{ getPrettyDate(project.date) }}
-        span(v-if="project.date && project.status")  | 
+        span(v-if="project.date && project.status")  |
         span(v-if="project.status") Status: {{ project.status }}
 
-    div.mt-2(v-if="project.team && project.team.length > 0")
+    div.pt-2(v-if="project.team && project.team.length > 0")
         strong Team:
         span  {{ project.team.join(', ') }}
-    
-    div.mt-2(v-if="project.tags && project.tags.length > 0")
+
+    div.pt-2(v-if="project.tags && project.tags.length > 0")
         strong Tags:
         v-chip.ma-1(v-for="tag in project.tags" :key="tag" small density="compact") {{ tag }}
-    
-    div.mt-2(v-if="project.technologies && project.technologies.length > 0")
+
+    div.pt-2(v-if="project.technologies && project.technologies.length > 0")
         strong Technologies:
         v-chip.ma-1(v-for="tech in project.technologies" :key="tech" small density="compact") {{ tech }}
-    div.mt-4(v-if="project.pdfs && project.pdfs.length > 0")
+    div.pt-4(v-if="project.pdfs && project.pdfs.length > 0")
         h3.mb-2 Associated Files:
         div.d-flex.flex-wrap.ga-2
             v-card.pa-2.ma-1.project-detail-pdf-card(
@@ -41,12 +41,12 @@ div.h-100.pa-4.project-detail-scroll(v-if="project")
                         v-icon.mr-2(icon="mdi-file-pdf-box" size="large" color="red-darken-2")
                     v-col
                         div.project-detail-pdf-name {{ pdfName }}
-                        
-    div.mt-3(v-if="project.description" v-html="processProjectContent(project.description, project.id)")
-    
-    div.mt-3(v-if="project.long_description" v-html="processProjectContent(project.long_description, project.id)")
 
-    div.mt-4(v-if="project.images && project.images.length > 0")
+    div.pt-3(v-if="project.description" v-html="processProjectContent(project.description, project.id)")
+
+    div.pt-3(v-if="project.long_description" v-html="processProjectContent(project.long_description, project.id)")
+
+    div.pt-4(v-if="project.images && project.images.length > 0")
         h3.mb-2 Images:
         div.d-flex.flex-wrap.ga-2
             img.ma-1(
@@ -57,9 +57,9 @@ div.h-100.pa-4.project-detail-scroll(v-if="project")
                 class="project-detail-image"
                 @click="$emit('open-image-dialog', getProjectImageUrl(project.id, imageNameInLoop) || '', `${project && project.title ? project.title : 'Project Image'} - ${imageNameInLoop || 'image'}`)"
             )
-    
-    
-    
+
+
+
 </template>
 
 <script>
@@ -93,7 +93,7 @@ export default {
             // Check if date is valid before calling toLocaleDateString
             if (isNaN(date.getTime())) {
                 // Handle invalid date string
-                return dateString; 
+                return dateString;
             }
             return date.toLocaleDateString('en-US', options);
         },
@@ -101,13 +101,13 @@ export default {
         handleDirectImageClick(projectId, imageName, projectTitle) {
             const actualImageName = typeof imageName === 'string' && imageName ? imageName : 'N/A';
             const actualTitle = typeof projectTitle === 'string' && projectTitle ? projectTitle : 'Image';
-            
+
             // Ensure projectId is a string before calling getProjectImageUrl
             const actualProjectId = typeof projectId === 'string' && projectId ? projectId : '';
 
             const imageUrl = this.getProjectImageUrl(actualProjectId, actualImageName);
             const altText = `${actualTitle} - ${actualImageName}`;
-            
+
             this.$emit('open-image-dialog', imageUrl, altText);
         },
 
@@ -146,7 +146,7 @@ export default {
         // Processes markdown content and replaces image placeholders
         processProjectContent(content, projectId) {
             if (!content || typeof content !== 'string') return '';
-            
+
             let htmlContent = '';
             try {
                 // Configure marked for HTML output
@@ -184,7 +184,7 @@ export default {
 
                     const finalImageUrlForEvent = rawImageUrl || ''; // Ensure string for event
                     const finalAltTextForEvent = rawAltText || 'Image'; // Ensure string for event
-                    
+
                     // Embed an onclick handler that dispatches a custom event for image clicks
                     // This allows handling clicks on dynamically generated HTML content
                     return `<img src="${finalImageUrlForEvent}" alt="${finalAltTextForEvent}" style="max-width: 100%; height: auto; display: block; margin: 10px auto; border-radius: 8px; border: 1px solid #ddd; cursor: pointer;" onclick="this.dispatchEvent(new CustomEvent('image-click-internal', { bubbles: true, detail: { src: '${finalImageUrlForEvent}', alt: '${finalAltTextForEvent}' } }))">`;
@@ -221,7 +221,7 @@ export default {
 .project-detail-scroll {
   overflow-y: auto;
   /* Ensure it takes full height of its container if needed */
-  height: 100%; 
+  height: 100%;
 }
 
 .project-detail-image {

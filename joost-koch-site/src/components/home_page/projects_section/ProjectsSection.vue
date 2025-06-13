@@ -1,6 +1,6 @@
 <template lang="pug">
 div
-    div.ml-6.mt-9(
+    div.ml-6.pt-9(
         :style="{'transform': 'rotate('+(projects_text_rotation)+'deg)', 'display': 'inline-block'}"
     )
         div(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
@@ -98,7 +98,7 @@ export default {
                 });
             },
             deep: true,
-            immediate: true 
+            immediate: true
         }
     },
     mounted() {
@@ -135,24 +135,24 @@ export default {
 <style scoped>
 /* Styles from HomeView.vue relevant to .post-it and .truncate-multi-line */
 .post-it {
-    max-height: 200px; 
+    max-height: 200px;
     /* Fixed height */
     max-width: 200px;
     font-size: clamp(0.8rem, 0.5vw, 2rem);
-    padding: 10px; 
+    padding: 10px;
     /* Added padding for content */
-    overflow: hidden; 
+    overflow: hidden;
     /* Hide overflowing content */
-    display: flex; 
+    display: flex;
     /* Using flex to help with content alignment */
-    flex-direction: column; 
+    flex-direction: column;
     /* Stack title and description vertically */
 }
 
 .truncate-multi-line {
-    overflow: hidden;         
-    text-overflow: ellipsis;  
-    display: -webkit-box;     
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
     /* Fallback for non-webkit */
     line-clamp: 3;
     /* Adjust number of lines for post-it note */
@@ -168,16 +168,16 @@ export default {
 }
 
 .post-it h2 {
-    margin-bottom: 5px; 
+    margin-bottom: 5px;
     /* Space between title and description */
-    flex-shrink: 0; 
+    flex-shrink: 0;
     /* Prevent title from shrinking */
 }
 
 /* Ensure #projects div itself can be a flex container if needed by children, though PostItNote handles its own layout */
 #projects {
     /* Add any necessary styling for the container itself, e.g., to ensure it has width */
-    width: 100%; 
+    width: 100%;
     /* Or other appropriate width management */
     /* min-height: 180px; */
     /* Ensure it has some height for observer */
