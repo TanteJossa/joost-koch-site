@@ -11,13 +11,14 @@ import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    assetsInclude: ['**/*.md'],
     plugins: [
         Vue({
-            template: { 
-                transformAssetUrls, 
+            template: {
+                transformAssetUrls,
                 preprocessOptions: {
                     vuePugPlugin
-                } 
+                }
             }
         }),
         // https://github.com/vuetifyjs/vuetify-loader/tree/master/packages/vite-plugin#readme
