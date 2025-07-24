@@ -5,13 +5,13 @@ div.w-100(style="position: relative; min-height: 350px")
     )
         PolaroidPhoto(
             v-for="(image, index) in shown_images"
-            :key="image.imageUrl"
+            :key="image.id"
             @mouseover="image_hover_index = index"
             @mouseleave="image_hover_index = -1"
             @polaroid-click="handlePolaroidClick"
             :style="{'transform': 'rotate('+image.rotation+'deg)', 'max-width': '250px', 'height': 'calc('+(250) + 'px' + (index < 2 ? ' - 50px)' : ')'), top:  'calc('+( image.top ) + '%' + (index < 2 ? ' +  90px)' : ')'), position: 'absolute', left: index * (90) / shown_images.length  + '%', 'z-index': image_hover_index == index ? '10 !important' : image.z_index}"
-            :image="image.imageUrl"
-            :date="image.date ? image.date : undefined"
+            :image="image.thumbnail_url"
+            :full_res_image="image.full_res_url"
         )
     div.ml-6(
         :style="{'transform': 'rotate('+(images_text_rotation)+'deg)', 'display': 'inline-block', 'position': 'absolute'}"
@@ -20,15 +20,13 @@ div.w-100(style="position: relative; min-height: 350px")
             MulticoloredText(
                 text="Foto's"
                 is_clickable
-                @click="loadRandomImages()"
+                @click="displayRandomImages()"
             )
 </template>
 
 <script>
 import MulticoloredText from '@/components/ui/elements/MulticoloredText.vue';
 import PolaroidPhoto from '@/components/ui/media/PolaroidPhoto.vue';
-import { getUniqueIntegers } from '../../../helpers';
-
 export default {
     name: 'PhotosSection',
     components: {
@@ -39,6 +37,7 @@ export default {
     data() {
         return {
             images: [],
+            all_images: [],
             image_hover_index: -1,
             images_text_rotation: (Math.random() * 15 - 7.5) * 0,
         };
@@ -60,53 +59,83 @@ export default {
         handlePolaroidClick(polaroidData) {
             this.$emit('show-polaroid-dialog', polaroidData);
         },
-        async loadRandomImages() {
-            const ids = getUniqueIntegers(5, 1, 62);
-            const imageModules = import.meta.glob('@/assets/luft/*.png', { query: '?url', import: 'default', eager: true });
-            const imageList = Object.entries(imageModules).map(([path]) => ({
-                filename: path.split('/').pop(),
-                // Directly use the URL
-                url: imageModules[path],
-            }));
-            this.images = [];
-            await Promise.all(
-                ids.map(async (index) => {
-                    if (index >= imageList.length) {
-                        return null;
-                    }
-                    const { filename, url } = imageList[index];
+       displayRandomImages() {
+           if (this.all_images.length === 0) return;
 
-                    try {
+           // Shuffle all_images and pick the first 5
+           const shuffled = this.all_images.sort(() => 0.5 - Math.random());
+           const selected = shuffled.slice(0, 5);
 
-                        // Extract date from filename (IMG_YYYYMMDD_...)
-                        const dateMatch = filename.match(/IMG_(\d{8})_/);
-                        let dateObj = null;
-                        if (dateMatch) {
-                            const dateString = dateMatch[1];
-                            const year = parseInt(dateString.slice(0, 4));
-                            // Month is 0-indexed
-                            const month = parseInt(dateString.slice(4, 6)) - 1;
-                            const day = parseInt(dateString.slice(6, 8));
-                            dateObj = new Date(year, month, day);
-                        }
+           this.images = selected.map(image => ({
+               ...image,
+               // Re-randomize position and rotation for each view
+               top: Math.random() * 20,
+               rotation: (40 * Math.random() - 20),
+               z_index: Math.round(Math.random() * 10).toString()
+           }));
+       },
+       async fetchAllImages() {
+          try {
+              const albumUrl = 'https://photos.app.goo.gl/aKcKBqgmSJwcQraN9';
+              const apiUrl = `https://luft-photo-requester-234817865209.europe-west4.run.app/get_google_photos_api?url=${encodeURIComponent(albumUrl)}`;
+              const response = await fetch(apiUrl);
 
-                        this.images.push({
-                            imageUrl: url,
-                            date: dateObj,
-                            top: Math.random() * 20,
-                            rotation: (40 * Math.random() - 20),
-                            z_index: Math.round(Math.random() * 10).toString()
-                        });
-                    } catch (error) {
-                        console.error(`Error loading image ${filename}:`, error);
-                        return null;
-                    }
-                })
-            );
-        },
+              if (!response.ok) {
+                  throw new Error(`API request failed with status ${response.status}`);
+              }
+
+              const photoData = await response.json();
+
+             this.all_images = photoData.map(image => {
+                 const thumbWidth = 250;
+                 const thumbHeight = Math.round(thumbWidth / image.aspect_ratio);
+
+                 // Get viewport dimensions
+                 const viewWidth = window.innerWidth * 0.9; // 90% of viewport width
+                 const viewHeight = window.innerHeight * 0.9; // 90% of viewport height
+
+                 // Calculate the best fit for the screen
+                 let newWidth, newHeight;
+                 if ((viewWidth / viewHeight) > image.aspect_ratio) {
+                     // Viewport is wider than the image, so height is the limiting factor
+                     newHeight = Math.min(image.max_height, viewHeight);
+                     newWidth = Math.round(newHeight * image.aspect_ratio);
+                 } else {
+                     // Viewport is taller than the image, so width is the limiting factor
+                     newWidth = Math.min(image.max_width, viewWidth);
+                     newHeight = Math.round(newWidth / image.aspect_ratio);
+                 }
+
+                 // Cap at 4K resolution
+                 const maxDim = 4096;
+                 if (newWidth > maxDim || newHeight > maxDim) {
+                     if (image.aspect_ratio >= 1) {
+                         newWidth = maxDim;
+                         newHeight = Math.round(newWidth / image.aspect_ratio);
+                     } else {
+                         newHeight = maxDim;
+                         newWidth = Math.round(newHeight * image.aspect_ratio);
+                     }
+                 }
+
+                 const fullResUrl = `${image.base_url}=w${Math.round(newWidth)}-h${Math.round(newHeight)}`;
+
+                 return {
+                     ...image,
+                     thumbnail_url: `${image.base_url}=w${thumbWidth}-h${thumbHeight}`,
+                     full_res_url: fullResUrl,
+                 };
+             });
+
+              this.displayRandomImages(); // Display initial set
+
+          } catch (error) {
+              console.error('Failed to load images from Google Photos API:', error);
+          }
+      },
     },
     mounted() {
-        this.loadRandomImages();
+        this.fetchAllImages();
     },
 };
 </script>

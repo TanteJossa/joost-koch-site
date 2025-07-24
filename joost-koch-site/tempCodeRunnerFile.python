@@ -1,4 +1,128 @@
 import requests
-result = requests.get('https://photos.app.goo.gl/aKcKBqgmSJwcQraN9')
+import re
+import json
+import logging
 
-print(result.text)
+# 1. Configure logging to show info-level messages
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def get_image_data(album_url: str):
+    """
+    Fetches a Google Photos album page and extracts image data.
+
+    Args:
+        album_url: The URL of the shared Google Photos album.
+
+    Returns:
+        A list of dictionaries, where each dictionary contains information
+        about an image (base_url, max_width, max_height, aspect_ratio).
+        Returns None if the request or parsing fails.
+    """
+    logging.info(f"Requesting album URL: {album_url}")
+    try:
+        # 2. Use a browser-like User-Agent to ensure the request is successful
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(album_url, headers=headers)
+        # Raise an exception for bad status codes (4xx or 5xx)
+        response.raise_for_status()
+        
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Failed to retrieve the album URL. Error: {e}")
+        return None
+
+    html_content = response.text
+    
+    # 3. Find the script tag containing the photo data using a regular expression.
+    # The data is located in a script tag as a parameter to AF_initDataCallback.
+    # We look for the one with the key 'ds:1' which typically holds the main content.
+    logging.info("Searching for photo data in the HTML content...")
+    
+    # This regex is designed to find the JavaScript call and capture the data structure within it.
+    match = re.search(r"AF_initDataCallback\({key: 'ds:1'.*?data:(.*), sideChannel: {}}\);</script>", html_content, re.DOTALL)
+    
+    if not match:
+        logging.error("Could not find the data block in the HTML. The page structure may have changed.")
+        return None
+
+    # 4. The captured group is a string that looks like a list. We parse it with JSON.
+    data_str = match.group(1).strip()
+    
+    try:
+        # The string is a valid JavaScript array, which is also valid JSON.
+        photo_data_list = json.loads(data_str)
+    except json.JSONDecodeError as e:
+        logging.error(f"Failed to parse JSON data. Error: {e}")
+        return None
+
+    # The actual list of photos is nested inside this structure at index 1
+    if not isinstance(photo_data_list, list) or len(photo_data_list) < 2 or not photo_data_list[1]:
+        logging.warning("Parsed data does not contain the expected photo list.")
+        return []
+
+    # 5. Iterate through the photo records and extract the needed info
+    images = []
+    for item in photo_data_list[1]:
+        try:
+            # Each item is a list containing photo metadata
+            # [media_id, [url, width, height, ...], timestamp, ...]
+            media_id, photo_info, timestamp = item[0], item[1], item[2]
+            
+            base_url = photo_info[0]
+            max_width = photo_info[1]
+            max_height = photo_info[2]
+
+            image_details = {
+                'id': media_id,
+                'base_url': base_url,
+                'max_width': max_width,
+                'max_height': max_height,
+                'aspect_ratio': round(max_width / max_height, 2) if max_height else 0
+            }
+            images.append(image_details)
+            logging.info(f"Successfully extracted data for image ID: {media_id}")
+
+        except (IndexError, TypeError) as e:
+            logging.warning(f"Skipping a malformed photo entry. Error: {e}. Data: {item}")
+            
+    logging.info(f"Extraction complete. Found {len(images)} images.")
+    return images
+
+
+if __name__ == '__main__':
+    # The album ID from your request
+    album_url = "https://photos.app.goo.gl/aKcKBqgmSJwcQraN9"
+    
+    extracted_images = get_image_data(album_url)
+
+    if extracted_images:
+        print("\n--- Extraction Summary ---")
+        print(f"Total images found: {len(extracted_images)}")
+
+        # Print details for the first 3 images as an example
+        print("\n--- Example Data (first 3 images) ---")
+        for image in extracted_images[:3]:
+            print(json.dumps(image, indent=2))
+
+        print("\n--- Generating Custom URLs ---")
+        print("You can generate a URL of any size by appending parameters to the 'base_url'.")
+        
+        # Get the first image for demonstration
+        sample_image = extracted_images[0]
+        
+        # Example: Generate a URL for an image with a width of 500px (height will be scaled automatically)
+        width_500_url = f"{sample_image['base_url']}=w500"
+        
+        # Example: Generate a URL for an image with a height of 300px
+        height_300_url = f"{sample_image['base_url']}=h300"
+
+        # Example: Get the full-resolution image
+        full_res_url = f"{sample_image['base_url']}=w{sample_image['max_width']}-h{sample_image['max_height']}"
+
+        print(f"Base URL: {sample_image['base_url']}")
+        print(f"URL with width=500: {width_500_url}")
+        print(f"URL with height=300: {height_300_url}")
+        print(f"URL for max resolution ({sample_image['max_width']}x{sample_image['max_height']}): {full_res_url}")
+    else:
+        print("\nCould not extract any images. Please check the logs above for errors.")

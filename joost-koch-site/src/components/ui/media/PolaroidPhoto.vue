@@ -3,12 +3,25 @@
 div.polaroid-container.hover-shadow( )
     div.polaroid(@mouseover="isHovered = true" @mouseleave="isHovered =false" @click="handleClick")
         div.image-container
-            img.h-100.w-100(:src="image" cover style="object-fit: cover; aspect-ratio: 5/4" alt="Polaroid Photo")
-            div(:class="show_glint ? 'glint' : ''")
+           <div class="placeholder-wrapper" v-if="!isImageLoaded">
+               <img class="h-100 w-100" :src="placeholderImage" style="object-fit: cover; aspect-ratio: 5/4;" alt="Loading...">
+               <v-progress-circular indeterminate color="grey-lighten-5" class="loader"></v-progress-circular>
+           </div>
+           img(class="h-100 w-100"
+               :src="image"
+               @load="isImageLoaded = true"
+               v-show="isImageLoaded"
+               cover
+               style="object-fit: cover; aspect-ratio: 5/4"
+               alt="Polaroid Photo"
+           )
+           div(:class="show_glint ? 'glint' : ''")
         div.date {{ formattedDate }}
 </template>
 
 <script>
+import placeholder from '@/assets/files/placeholder.webp';
+
 export default {
     name: 'PolaroidPhoto',
     emits: ['polaroid-click'],
@@ -16,6 +29,11 @@ export default {
         image: {
             type: String,
             required: true,
+        },
+        full_res_image: {
+           type: String,
+           required: false,
+           default: null,
         },
         date: {
             type: Date,
@@ -25,19 +43,26 @@ export default {
     data() {
         return {
             isHovered: false,
-            show_glint: false
+            show_glint: false,
+            isImageLoaded: false,
+            placeholderImage: placeholder,
         };
     },
     methods: {
 
         handleClick() {
             this.$emit('polaroid-click', {
-                image: this.image,
+                image: this.full_res_image || this.image,
                 date: this.date,
             });
         },
     },
     watch: {
+       image(newVal, oldVal) {
+           if (newVal !== oldVal) {
+               this.isImageLoaded = false;
+           }
+       },
         isHovered(){
             if (!this.show_glint){
                 this.show_glint = true;
@@ -93,9 +118,18 @@ export default {
     border: 2px solid #ccc;
     background: #f5f5f5;
     width: fit-content;
-    
-}
 
+}
+.placeholder-wrapper {
+   position: relative;
+   filter: grayscale(80%) opacity(60%);
+}
+.loader {
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+}
 
 .glint {
     position: absolute;
