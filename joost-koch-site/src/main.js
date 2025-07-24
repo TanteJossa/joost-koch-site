@@ -17,7 +17,7 @@ import { createApp } from 'vue'
 
 import { createPinia } from 'pinia'
 import pdfUtilsPlugin from './pdf_utils';
-
+import analyticsPlugin from './plugins/analytics';
 import router from '@/router'
 
 const app = createApp(App)
@@ -25,6 +25,7 @@ const app = createApp(App)
 app
     .use(createPinia())
     .use(pdfUtilsPlugin)
+    .use(analyticsPlugin)
     .use(router)
 
 registerPlugins(app)

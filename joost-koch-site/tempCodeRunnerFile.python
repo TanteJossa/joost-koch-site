@@ -1,0 +1,4 @@
+import requests
+result = requests.get('https://photos.app.goo.gl/aKcKBqgmSJwcQraN9')
+
+print(result.text)
