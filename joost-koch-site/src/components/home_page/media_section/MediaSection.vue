@@ -48,7 +48,7 @@ div.pl-6.w-100.media-section-main
         div
             v-btn.mt-2(
                 text="Meer"
-                color="secondary"  
+                color="secondary"
                 @click="loadExtraMedia"
                 :loading="loading_media"
                 variant="outlined"
@@ -74,47 +74,65 @@ export default {
         }
     },
     methods: {
-        async getSheetData(n, sheet='Series', start_index=0, is_sorted=false) {
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbznFPhD1jfyaPYukVEd8dMjcOW6oDUlM7rq4mf2Zer1KsC0txHwh7XuAGGx3NPKTsMG/exec'; // Replace with your deployed App Script URL
+        async getSheetData(n, sheetName, startIndex = 1, isSorted = false) {
+            const apiUrl = 'https://joost-koch-film-api-234817865209.europe-west4.run.app/get-sheet-data';
             const params = new URLSearchParams({
-                n: n,
-                sheetName: sheet,
-                startIndex: is_sorted ? 3 + start_index : 3,
-                isSorted: is_sorted
+                sheetName,
+                n,
+                startIndex,
+                isSorted,
             });
 
             try {
-                const response = await fetch(`${scriptURL}?${params}`);
+                const response = await fetch(`${apiUrl}?${params}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Unknown API error');
+                }
                 const data = await response.json();
-                // console.log(data)
+                if (data.message) {
+                    console.log(data.message);
+                    return [];
+                }
                 return data;
             } catch (error) {
-                console.error('Error fetching data:', error);
-                return null;
+                console.error('Failed to fetch data:', error);
+                return [];
             }
         },
-        async loadMedia(){
-            this.loading_media = true
+        async loadMedia() {
+            this.loading_media = true;
+            this.series = [];
+            this.movies = [];
 
+            const n = 5;
+            const startIndex = 1;
+            const isSorted = this.media_is_sorted;
 
-            const [serie_result, movie_result] = await Promise.all([this.getSheetData(5, "Series", 0, this.media_is_sorted), this.getSheetData(5, "Films", 0, this.media_is_sorted)])
-            this.series = serie_result
-            this.movies = movie_result
-            console.log(this.series, this.movies)
-            this.loading_media = false
-        
-            
+            const [serie_result, movie_result] = await Promise.all([
+                this.getSheetData(n, "Series", startIndex, isSorted),
+                this.getSheetData(n, "Films", startIndex, isSorted)
+            ]);
 
+            this.series = serie_result;
+            this.movies = movie_result;
+            this.loading_media = false;
         },
-        async loadExtraMedia(){
-            this.loading_media = true
-            if (this.media_type == 'movies'){
-                this.movies = this.movies.concat(await this.getSheetData(10, "Films", this.movies.length, this.media_is_sorted))
+        async loadExtraMedia() {
+            this.loading_media = true;
+            const n = 10;
+            const isSorted = this.media_is_sorted;
+
+            if (this.media_type === 'movies') {
+                const startIndex = this.movies.length + 1;
+                const extraMovies = await this.getSheetData(n, "Films", startIndex, isSorted);
+                this.movies = this.movies.concat(extraMovies);
             } else {
-                this.series = this.series.concat(await this.getSheetData(10, "Series", this.series.length, this.media_is_sorted))
+                const startIndex = this.series.length + 1;
+                const extraSeries = await this.getSheetData(n, "Series", startIndex, isSorted);
+                this.series = this.series.concat(extraSeries);
             }
-            this.loading_media = false
-        
+            this.loading_media = false;
         }
     },
     mounted() {

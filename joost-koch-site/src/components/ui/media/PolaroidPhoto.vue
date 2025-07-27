@@ -3,19 +3,18 @@
 div.polaroid-container.hover-shadow( )
     div.polaroid(@mouseover="isHovered = true" @mouseleave="isHovered =false" @click="handleClick")
         div.image-container
-           <div class="placeholder-wrapper" v-if="!isImageLoaded">
-               <img class="h-100 w-100" :src="placeholderImage" style="object-fit: cover; aspect-ratio: 5/4;" alt="Loading...">
-               <v-progress-circular indeterminate color="grey-lighten-5" class="loader"></v-progress-circular>
-           </div>
-           img(class="h-100 w-100"
+          .placeholder-wrapper(v-if="!isImageLoaded")
+            img.h-100.w-100(:src="placeholderImage", style="object-fit: cover; aspect-ratio: 5/4;", alt="Loading...")
+            v-progress-circular.loader(indeterminate, color="grey-lighten-5")
+          img(class="h-100 w-100"
                :src="image"
                @load="isImageLoaded = true"
                v-show="isImageLoaded"
                cover
                style="object-fit: cover; aspect-ratio: 5/4"
                alt="Polaroid Photo"
-           )
-           div(:class="show_glint ? 'glint' : ''")
+          )
+          div(:class="show_glint ? 'glint' : ''")
         div.date {{ formattedDate }}
 </template>
 
