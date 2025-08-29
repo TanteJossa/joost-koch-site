@@ -273,5 +273,39 @@
       "browser.png",
       "practice-collection.png"
     ]
+  },
+  {
+    "id": "motie-viewer",
+    "title": "Tweede Kamer Motie Viewer",
+    "date": "2024-08-29T12:00:00.000Z",
+    "rank": 7,
+    "tags": [
+      "Open Data",
+      "Vue.js",
+      "Vuetify",
+      "OData",
+      "API",
+      "Frontend",
+      "Government Data"
+    ],
+    "status": "Live",
+    "team": [
+      "Joost Koch"
+    ],
+    "technologies": [
+      "Vue.js 3",
+      "Vuetify",
+      "JavaScript",
+      "OData API",
+      "Axios"
+    ],
+    "description": "A dynamic web application that provides a user-friendly interface to browse, search, and view motions from the Dutch House of Representatives (Tweede Kamer). This project leverages the official open OData API to fetch real-time data, including motion details, submitters, and voting results.\n\n{{overview.png}}\n\n**Key Features:**\n\n*   **Live Data Integration:** Connects directly to the Tweede Kamer's OData API, ensuring all information is up-to-date.\n*   **Advanced Filtering & Sorting:** Allows users to easily filter motions by title and subject, and sort them by date. \n*   **Detailed Motion View:** Offers a comprehensive modal view for each motion, displaying details, submitters, voting records per party, and a link to the official document. {{motion_detail.png}} {{voting_results.png}}\n*   **Responsive Design:** Built with Vue.js and Vuetify for a seamless experience on both desktop and mobile devices.\n\n**Data Source:**\nThis project is powered by the official Open Data API from the Dutch House of Representatives. You can explore the documentation and data portal here:\n*   [Tweede Kamer Open Data Portal](https://opendata.tweedekamer.nl/)\n*   [API Documentation](https://opendata.tweedekamer.nl/documentatie)",
+    "url": "https://jkoch.nl/motie",
+    "github": "https://github.com/TanteJossa/joost-koch-site",
+    "images": [
+      "overview.png",
+      "motion_detail.png",
+      "voting_results.png"
+    ]
   }
 ]
