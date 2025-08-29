@@ -61,7 +61,7 @@ export default {
             const box = container.getBoundingClientRect();
             // Ensure $vuetify and display are available, provide fallback if not
             const lgAndUp = this.$vuetify && this.$vuetify.display ? this.$vuetify.display.lgAndUp : true;
-            const itemsPerWidth = Math.floor(box.width / 220);
+            const itemsPerWidth = Math.floor(box.width / 180);
             if (itemsPerWidth <= 0 && this.projects.length > 0) return this.projects.slice(0,1); // show at least one if space is very small
             return this.projects.slice(0, itemsPerWidth * (lgAndUp ? 1 : 1));
         },
@@ -181,5 +181,7 @@ export default {
     /* Or other appropriate width management */
     /* min-height: 180px; */
     /* Ensure it has some height for observer */
+  justify-content: space-around;
+  display: flex
 }
 </style>

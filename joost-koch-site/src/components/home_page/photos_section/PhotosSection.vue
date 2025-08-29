@@ -1,5 +1,5 @@
 <template lang="pug">
-div.w-100(style="position: relative; min-height: 350px")
+div.w-100#photo-container(style="position: relative; min-height: 350px")
     div.w-100.d-flex.flex-wrap#photo-container(
         style="position: absolute; top: 0; left: 0; "
     )
@@ -25,118 +25,145 @@ div.w-100(style="position: relative; min-height: 350px")
 </template>
 
 <script>
-import MulticoloredText from '@/components/ui/elements/MulticoloredText.vue';
-import PolaroidPhoto from '@/components/ui/media/PolaroidPhoto.vue';
+import MulticoloredText from "@/components/ui/elements/MulticoloredText.vue";
+import PolaroidPhoto from "@/components/ui/media/PolaroidPhoto.vue";
 export default {
-    name: 'PhotosSection',
-    components: {
-        MulticoloredText,
-        PolaroidPhoto,
+  name: "PhotosSection",
+  components: {
+    MulticoloredText,
+    PolaroidPhoto,
+  },
+  emits: ["show-polaroid-dialog"],
+  data() {
+    return {
+      images: [],
+      all_images: [],
+      image_hover_index: -1,
+      images_text_rotation: (Math.random() * 15 - 7.5) * 0,
+      projectsResizeObserver: null,
+      shown_images: [],
+    };
+  },
+  computed: {
+  },
+  methods: {
+    calculateShownImages() {
+      const container = document.getElementById("photo-container");
+      if (!container) {
+        this.shown_images = this.images;
+      }
+      // Ensure division by zero is handled if images.length is 0, though slice handles it.
+      if (this.images.length === 0) {
+        this.shown_images = [];
+      }
+      this.shown_images = this.images.slice(0, Math.round(container.clientWidth / 220));
     },
-    emits: ['show-polaroid-dialog'],
-    data() {
-        return {
-            images: [],
-            all_images: [],
-            image_hover_index: -1,
-            images_text_rotation: (Math.random() * 15 - 7.5) * 0,
-        };
+    handlePolaroidClick(polaroidData) {
+      this.$emit("show-polaroid-dialog", polaroidData);
     },
-    computed: {
-        shown_images() {
-            const container = document.getElementById('photo-container');
-            if (!container) {
-                return this.images;
-            }
-            // Ensure division by zero is handled if images.length is 0, though slice handles it.
-            if (this.images.length === 0) {
-                return [];
-            }
-            return this.images.slice(0, Math.round(container.clientWidth / 220));
-        },
+    displayRandomImages() {
+      if (this.all_images.length === 0) return;
+
+      // Shuffle all_images and pick the first 5
+      const shuffled = this.all_images.sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 5);
+
+      this.images = selected.map((image) => ({
+        ...image,
+        // Re-randomize position and rotation for each view
+        top: Math.random() * 20,
+        rotation: 40 * Math.random() - 20,
+        z_index: Math.round(Math.random() * 10).toString(),
+      }));
     },
-    methods: {
-        handlePolaroidClick(polaroidData) {
-            this.$emit('show-polaroid-dialog', polaroidData);
-        },
-       displayRandomImages() {
-           if (this.all_images.length === 0) return;
+    async fetchAllImages() {
+      try {
+        const albumUrl = "https://photos.app.goo.gl/aKcKBqgmSJwcQraN9";
+        const apiUrl = `https://luft-photo-requester-234817865209.europe-west4.run.app/get_google_photos_api?url=${encodeURIComponent(
+          albumUrl
+        )}`;
+        const response = await fetch(apiUrl);
 
-           // Shuffle all_images and pick the first 5
-           const shuffled = this.all_images.sort(() => 0.5 - Math.random());
-           const selected = shuffled.slice(0, 5);
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
 
-           this.images = selected.map(image => ({
-               ...image,
-               // Re-randomize position and rotation for each view
-               top: Math.random() * 20,
-               rotation: (40 * Math.random() - 20),
-               z_index: Math.round(Math.random() * 10).toString()
-           }));
-       },
-       async fetchAllImages() {
-          try {
-              const albumUrl = 'https://photos.app.goo.gl/aKcKBqgmSJwcQraN9';
-              const apiUrl = `https://luft-photo-requester-234817865209.europe-west4.run.app/get_google_photos_api?url=${encodeURIComponent(albumUrl)}`;
-              const response = await fetch(apiUrl);
+        const photoData = await response.json();
 
-              if (!response.ok) {
-                  throw new Error(`API request failed with status ${response.status}`);
-              }
+        this.all_images = photoData.map((image) => {
+          const thumbWidth = 250;
+          const thumbHeight = Math.round(thumbWidth / image.aspect_ratio);
 
-              const photoData = await response.json();
+          // Get viewport dimensions
+          const viewWidth = window.innerWidth * 0.9; // 90% of viewport width
+          const viewHeight = window.innerHeight * 0.9; // 90% of viewport height
 
-             this.all_images = photoData.map(image => {
-                 const thumbWidth = 250;
-                 const thumbHeight = Math.round(thumbWidth / image.aspect_ratio);
-
-                 // Get viewport dimensions
-                 const viewWidth = window.innerWidth * 0.9; // 90% of viewport width
-                 const viewHeight = window.innerHeight * 0.9; // 90% of viewport height
-
-                 // Calculate the best fit for the screen
-                 let newWidth, newHeight;
-                 if ((viewWidth / viewHeight) > image.aspect_ratio) {
-                     // Viewport is wider than the image, so height is the limiting factor
-                     newHeight = Math.min(image.max_height, viewHeight);
-                     newWidth = Math.round(newHeight * image.aspect_ratio);
-                 } else {
-                     // Viewport is taller than the image, so width is the limiting factor
-                     newWidth = Math.min(image.max_width, viewWidth);
-                     newHeight = Math.round(newWidth / image.aspect_ratio);
-                 }
-
-                 // Cap at 4K resolution
-                 const maxDim = 4096;
-                 if (newWidth > maxDim || newHeight > maxDim) {
-                     if (image.aspect_ratio >= 1) {
-                         newWidth = maxDim;
-                         newHeight = Math.round(newWidth / image.aspect_ratio);
-                     } else {
-                         newHeight = maxDim;
-                         newWidth = Math.round(newHeight * image.aspect_ratio);
-                     }
-                 }
-
-                 const fullResUrl = `${image.base_url}=w${Math.round(newWidth)}-h${Math.round(newHeight)}`;
-
-                 return {
-                     ...image,
-                     thumbnail_url: `${image.base_url}=w${thumbWidth}-h${thumbHeight}`,
-                     full_res_url: fullResUrl,
-                 };
-             });
-
-              this.displayRandomImages(); // Display initial set
-
-          } catch (error) {
-              console.error('Failed to load images from Google Photos API:', error);
+          // Calculate the best fit for the screen
+          let newWidth, newHeight;
+          if (viewWidth / viewHeight > image.aspect_ratio) {
+            // Viewport is wider than the image, so height is the limiting factor
+            newHeight = Math.min(image.max_height, viewHeight);
+            newWidth = Math.round(newHeight * image.aspect_ratio);
+          } else {
+            // Viewport is taller than the image, so width is the limiting factor
+            newWidth = Math.min(image.max_width, viewWidth);
+            newHeight = Math.round(newWidth / image.aspect_ratio);
           }
-      },
+
+          // Cap at 4K resolution
+          const maxDim = 4096;
+          if (newWidth > maxDim || newHeight > maxDim) {
+            if (image.aspect_ratio >= 1) {
+              newWidth = maxDim;
+              newHeight = Math.round(newWidth / image.aspect_ratio);
+            } else {
+              newHeight = maxDim;
+              newWidth = Math.round(newHeight * image.aspect_ratio);
+            }
+          }
+
+          const fullResUrl = `${image.base_url}=w${Math.round(
+            newWidth
+          )}-h${Math.round(newHeight)}`;
+
+          return {
+            ...image,
+            thumbnail_url: `${image.base_url}=w${thumbWidth}-h${thumbHeight}`,
+            full_res_url: fullResUrl,
+          };
+        });
+
+        this.displayRandomImages(); // Display initial set
+      } catch (error) {
+        console.error("Failed to load images from Google Photos API:", error);
+      }
     },
-    mounted() {
-        this.fetchAllImages();
-    },
+  },
+  mounted() {
+    this.fetchAllImages();
+    const container = document.getElementById("photo-container");
+    console.log(container)
+    if (container && typeof ResizeObserver !== "undefined") {
+      this.projectsResizeObserver = new ResizeObserver(() => {
+        this.calculateShownImages()
+      });
+      this.projectsResizeObserver.observe(container);
+    } else if (typeof ResizeObserver === "undefined") {
+      // Fallback for environments without ResizeObserver or if needed
+      window.addEventListener("resize", console.log(this.calculateShownImages()));
+    }
+  },
+  beforeUnmount() {
+    if (this.projectsResizeObserver) {
+    const container = document.getElementById("photo-container");
+      if (container) {
+        this.projectsResizeObserver.unobserve(container);
+      }
+      this.projectsResizeObserver.disconnect();
+    } else if (typeof ResizeObserver === "undefined") {
+      window.removeEventListener("resize",  this.calculateShownImages());
+    }
+  },
 };
 </script>
 
@@ -144,17 +171,17 @@ export default {
 /* Add any specific styles for PhotosSection if needed */
 /* For example, ensuring the container has a minimum height or specific layout */
 .w-100 {
-    width: 100%;
+  width: 100%;
 }
 .d-flex {
-    display: flex;
+  display: flex;
 }
 .flex-wrap {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 .ml-6 {
-    margin-left: 2.25rem;
-    /* Approximation for Vuetify ml-6, adjust if precise value is known */
+  margin-left: 2.25rem;
+  /* Approximation for Vuetify ml-6, adjust if precise value is known */
 }
 /* Styles for PolaroidPhoto and MulticoloredText are in their respective components */
 </style>

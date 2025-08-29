@@ -113,6 +113,8 @@ export default {
 
             is_moving_wood: false,
 
+            projectsResizeObserver: null
+
         }
     },
 
@@ -434,11 +436,27 @@ export default {
         // Fetch all data first
         await Promise.all([]);
 
-        // shown_projects update after projects load removed, handled in ProjectsSection.vue via watcher
-
-        this.update_homegrid++
-        // console.log(this.homegrid_height)
-
+      const container = document.getElementById('home-grid');
+        if (container && typeof ResizeObserver !== 'undefined') {
+            this.projectsResizeObserver = new ResizeObserver(() => {
+                this.update_homegrid++
+            });
+            this.projectsResizeObserver.observe(container);
+        } else if (typeof ResizeObserver === 'undefined') {
+            // Fallback for environments without ResizeObserver or if needed
+            window.addEventListener('resize', this.update_homegrid++);
+        }
+    },
+    beforeUnmount() {
+        if (this.projectsResizeObserver) {
+      const container = document.getElementById('home-grid');
+            if (container) {
+                 this.projectsResizeObserver.unobserve(container);
+            }
+            this.projectsResizeObserver.disconnect();
+        } else if (typeof ResizeObserver === 'undefined') {
+             window.removeEventListener('resize', this.update_homegrid++);
+        }
     },
 };
 </script>
