@@ -2,10 +2,10 @@
 div.w-100.home-view-wrapper
 
     WoodTextureBackground.wood-texture-background(ref="woodTexture" :canvasHeight="homegrid_height" )
-    div.w-100#home-grid.home-grid-container(
+    div.w-100.home-grid-container(
         @mousemove="woodMouseMove"
     )
-        HomeGrid
+        HomeGrid#home-grid
             template(#name)
                 NameSection(
                     v-model="is_moving_wood"
@@ -158,9 +158,9 @@ export default {
             const el = document.getElementById('home-grid')
             // console.log(el)
             if (el){
-                return el.clientHeight + 'px'
+                return el.scrollHeight + 'px'
             }
-            return '100vh'
+            return '100dvh'
         },
         cv_url(){
           return window.location.origin + cv
@@ -460,7 +460,7 @@ export default {
 
 .home-grid-container {
   position: absolute;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 

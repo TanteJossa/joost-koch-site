@@ -9,7 +9,7 @@ div
                 is_clickable
                 @click="$emit('open-projects-view')"
             )
-    div.ml-3.d-flex.flex-row#projects(ref="projectsContainerRef")
+    div.ml-3.d-flex.flex-row#projects(ref="projectsContainerRef" @update="updateShownProjects")
         PostItNote.ml-3.post-it(
             v-for="(project, index) in shown_projects"
             :key="project.id"
@@ -63,7 +63,7 @@ export default {
             const lgAndUp = this.$vuetify && this.$vuetify.display ? this.$vuetify.display.lgAndUp : true;
             const itemsPerWidth = Math.floor(box.width / 220);
             if (itemsPerWidth <= 0 && this.projects.length > 0) return this.projects.slice(0,1); // show at least one if space is very small
-            return this.projects.slice(0, itemsPerWidth * (lgAndUp ? 2 : 1));
+            return this.projects.slice(0, itemsPerWidth * (lgAndUp ? 1 : 1));
         },
         updateShownProjects() {
             this.shown_projects = this.calculateShownProjects();

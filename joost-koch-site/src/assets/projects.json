@@ -190,42 +190,88 @@
       "latex_conversion_example.png"
     ]
   },
-{
-  "id": "literary-analysis-ai",
-  "title": "Literary Research AI Automator",
-  "date": "2024-03-15T12:00:00.000Z",
-  "rank": 0,
-  "tags": [
-    "AI",
-    "Research Automation",
-    "Python",
-    "Google Gemini API",
-    "NLP",
-    "Academic Research",
-    "Literature Review",
-    "Paper Scraping",
-    "Paper Downloading"
-  ],
-  "github": "https://github.com/TanteJossa/literary-analysis-ai",
-  "status": "Functional Prototype",
-  "team": ["Joost Koch"],
-  "technologies": [
-    "Python",
-    "Google Gemini API (gemini-1.5-flash)",
-    "requests",
-    "BeautifulSoup4",
-    "python-dotenv",
-    "arxiv"
-  ],
-  "description": "This Python project automates key steps in the literary and academic research process. It leverages the **Google Gemini API** for advanced text analysis and keyword generation, systematically searches for academic papers from sources like Google Scholar and arXiv, and attempts to download them, streamlining the initial research workflow.\n\n**Core Functionality:**\n\n1.  **API & Configuration:** Securely configures Google Gemini API access via an `.env` file and loads research parameters (question, subject name, search limits) from **research_config.json**.\n2.  **AI Keyword Generation:** Uses the Gemini API (`gemini-1.5-flash`) to analyze a given research question and generate a categorized list of search keywords (high, medium, low probability).\n3.  **Paper Discovery:** The **paper_finder.py** module employs these keywords to search for relevant academic papers on platforms like Google Scholar and arXiv.\n4.  **Automated Downloading:** The **paper_downloader.py** module attempts to download the identified papers, trying common extensions like `.pdf` and `.doc`.\n5.  **Organized Output:** Saves downloaded papers and an **overview.json** (metadata of downloads) into a structured directory: `research_outputs/[subject_name]/`.\n\n**Key Files:**\n*   **main.py**: Orchestrates the entire process.\n*   **paper_finder.py**: Handles searching for papers.\n*   **paper_downloader.py**: Manages downloading papers.\n*   **research_config.json**: Stores user-defined research parameters.\n*   **.env**: For API key storage.\n\n**Envisioned Research Workflow Integration:**\nThis tool is designed to be part of a larger research workflow:\n\n1.  **Locate Sources:** Combine manual deep dives (e.g., using X.com, direct Gemini research with text extraction from HTML) with this automated tool for paper retrieval.\n2.  **Combine/Analyze Sources:** Use a powerful LLM (like Gemini 1.5 Pro) to synthesize information from all sources into a single, attributed document.\n3.  **Execute Research & Create Visualizations:** Define methodology, use Python (e.g., in a 'Roocode' environment with Gemini integration) for data analysis, graph generation (Matplotlib, Seaborn), and create textual summaries in JSON.\n4.  **Summarize Results:** Develop a final summary based on the synthesized document.\n5.  **Create TeX Report:** Produce a formal LaTeX report, managing citations with a `.bib` file and debugging in a 'Roocode' environment.\n    *   *Conceptual Latex Download Tool:* This could further streamline Step 5 by assisting with LaTeX distributions, templates, or fetching LaTeX sources of papers.\n\nThe project includes error handling for API configuration, file operations, and JSON parsing to ensure robustness. The **README.md** provides detailed setup and usage instructions.",
-  "images": [
-    "research_config_example.png"
-  ],
-  "pdfs": [
-    "pws-opiod-2.5-hours.pdf",
-    "neurotisicm-6hour-total.pdf",
-    "alchohol_retrograde_memory_facilitation.pdf",
-    ""
-  ]
-}
+  {
+    "id": "literary-analysis-ai",
+    "title": "Literary Research AI Automator",
+    "date": "2024-03-15T12:00:00.000Z",
+    "rank": 0,
+    "tags": [
+      "AI",
+      "Research Automation",
+      "Python",
+      "Google Gemini API",
+      "NLP",
+      "Academic Research",
+      "Literature Review",
+      "Paper Scraping",
+      "Paper Downloading"
+    ],
+    "github": "https://github.com/TanteJossa/literary-analysis-ai",
+    "status": "Functional Prototype",
+    "team": [
+      "Joost Koch"
+    ],
+    "technologies": [
+      "Python",
+      "Google Gemini API (gemini-1.5-flash)",
+      "requests",
+      "BeautifulSoup4",
+      "python-dotenv",
+      "arxiv"
+    ],
+    "description": "This Python project automates key steps in the literary and academic research process. It leverages the **Google Gemini API** for advanced text analysis and keyword generation, systematically searches for academic papers from sources like Google Scholar and arXiv, and attempts to download them, streamlining the initial research workflow.\n\n**Core Functionality:**\n\n1.  **API & Configuration:** Securely configures Google Gemini API access via an `.env` file and loads research parameters (question, subject name, search limits) from **research_config.json**.\n2.  **AI Keyword Generation:** Uses the Gemini API (`gemini-1.5-flash`) to analyze a given research question and generate a categorized list of search keywords (high, medium, low probability).\n3.  **Paper Discovery:** The **paper_finder.py** module employs these keywords to search for relevant academic papers on platforms like Google Scholar and arXiv.\n4.  **Automated Downloading:** The **paper_downloader.py** module attempts to download the identified papers, trying common extensions like `.pdf` and `.doc`.\n5.  **Organized Output:** Saves downloaded papers and an **overview.json** (metadata of downloads) into a structured directory: `research_outputs/[subject_name]/`.\n\n**Key Files:**\n*   **main.py**: Orchestrates the entire process.\n*   **paper_finder.py**: Handles searching for papers.\n*   **paper_downloader.py**: Manages downloading papers.\n*   **research_config.json**: Stores user-defined research parameters.\n*   **.env**: For API key storage.\n\n**Envisioned Research Workflow Integration:**\nThis tool is designed to be part of a larger research workflow:\n\n1.  **Locate Sources:** Combine manual deep dives (e.g., using X.com, direct Gemini research with text extraction from HTML) with this automated tool for paper retrieval.\n2.  **Combine/Analyze Sources:** Use a powerful LLM (like Gemini 1.5 Pro) to synthesize information from all sources into a single, attributed document.\n3.  **Execute Research & Create Visualizations:** Define methodology, use Python (e.g., in a 'Roocode' environment with Gemini integration) for data analysis, graph generation (Matplotlib, Seaborn), and create textual summaries in JSON.\n4.  **Summarize Results:** Develop a final summary based on the synthesized document.\n5.  **Create TeX Report:** Produce a formal LaTeX report, managing citations with a `.bib` file and debugging in a 'Roocode' environment.\n    *   *Conceptual Latex Download Tool:* This could further streamline Step 5 by assisting with LaTeX distributions, templates, or fetching LaTeX sources of papers.\n\nThe project includes error handling for API configuration, file operations, and JSON parsing to ensure robustness. The **README.md** provides detailed setup and usage instructions.",
+    "images": [
+      "research_config_example.png"
+    ],
+    "pdfs": [
+      "pws-opiod-2.5-hours.pdf",
+      "neurotisicm-6hour-total.pdf",
+      "alchohol_retrograde_memory_facilitation.pdf",
+      ""
+    ]
+  },
+  {
+    "id": "formule-trainer",
+    "title": "Formula Trainer: AI-Powered Physics & Math Practice Platform",
+    "date": "2024-05-20T10:00:00.000Z",
+    "rank": 2,
+    "tags": [
+      "AI",
+      "EdTech",
+      "Physics",
+      "Mathematics",
+      "Vue.js",
+      "Vuetify",
+      "Firebase",
+      "Node.js",
+      "Symbolic Algebra",
+      "LaTeX"
+    ],
+    "url": "https://formule-trainer.web.app",
+    "status": "Live",
+    "team": [
+      "Joost Koch"
+    ],
+    "technologies": [
+      "Vue.js 3",
+      "Vuetify",
+      "Pinia",
+      "Vite",
+      "TypeScript",
+      "Firebase (Firestore)",
+      "CortexJS Compute Engine",
+      "MathLive",
+      "KaTeX",
+      "Python",
+      "Flask"
+    ],
+    "description": "The Formula Trainer is an intelligent web platform designed to revolutionize how students learn and practice physics and mathematics formulas. Moving beyond static question banks, this application functions as a dynamic tutor, capable of generating a virtually infinite number of practice problems on the fly.\n\n{{overview.png}}\n\n**Core Capabilities:**\n\n*   **Symbolic Formula Manipulation:** At its heart, the platform uses the **CortexJS Compute Engine** to perform symbolic algebra. When a formula like `Ek = 1/2 * m * v^2` is defined, the system automatically and correctly inverts it to solve for every variable (e.g., `m = 2Ek / v^2`), a feature showcased in the variable table.\n    {{practice-overview.png}}\n\n*   **Dynamic Question Generation:** The system dynamically creates unique practice questions by selecting a formula, choosing a variable to solve for, and generating random but realistic values for the other variables. This ensures students are not just memorizing answers but understanding the relationships within the formula.\n\n*   **Structured Practice Sessions:** Users can practice with individual formulas or entire collections linked to specific learning objectives. The platform offers different modes, including a mixed review and a mastery-based approach where students must demonstrate proficiency before moving on.\n    {{practice-collection.png}}\n\n*   **Step-by-Step Guided Solutions:** For each problem, the application provides a detailed, step-by-step solution following the FIRE method (Formule, Invullen, Rekenen, Eenheid). It also includes a multi-level hinting system to guide students toward the correct answer without giving it away immediately.\n    {{fullquestion.png}}\n\n*   **Rich Mathematical Interface:** Built with **Vue.js 3**, **Vuetify**, and **TypeScript**, the frontend provides a seamless user experience. It uses **MathLive** for interactive LaTeX input and **KaTeX** for high-quality mathematical typesetting, ensuring all equations are clear and professionally rendered.\n\n*   **Content Management:** The platform includes a comprehensive browser for managing formulas and question collections, allowing for easy organization and curation of content.\n    {{browser.png}}\n\nThis project demonstrates a sophisticated application of symbolic computation and modern web technologies to create a powerful and personalized educational tool that adapts to the needs of the learner.",
+    "images": [
+      "overview.png",
+      "practice-overview.png",
+      "fullquestion.png",
+      "browser.png",
+      "practice-collection.png"
+    ]
+  }
 ]
