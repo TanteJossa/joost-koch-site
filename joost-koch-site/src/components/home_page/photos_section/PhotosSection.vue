@@ -18,6 +18,7 @@ div.w-100#photo-container(style="position: relative; min-height: 350px")
     )
         div(style="font-family: 'CreamyChalk'; font-size: calc(min(100vw, 600px) / 10)")
             MulticoloredText(
+
                 text="Foto's"
                 is_clickable
                 @click="displayRandomImages()"
@@ -75,6 +76,7 @@ export default {
         rotation: 40 * Math.random() - 20,
         z_index: Math.round(Math.random() * 10).toString(),
       }));
+      this.calculateShownImages();
     },
     async fetchAllImages() {
       try {

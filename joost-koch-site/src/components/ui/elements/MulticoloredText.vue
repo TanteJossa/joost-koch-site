@@ -1,6 +1,6 @@
 <template lang="pug">
-span(:class="is_clickable ? 'text-hover' : ''")
-    span(v-for="(letter, index) in letters" :key="index" :style="{ color: colors[index] }") {{ letter }}
+span(:class="is_clickable ? 'text-hover' : ''" :style="{'cursor': is_clickable ? 'pointer' : 'default'}")
+    span.prevent-select(v-for="(letter, index) in letters" :key="index" :style="{ color: colors[index] }") {{ letter }}
 </template>
 
 <script>
@@ -76,5 +76,11 @@ export default {
 .text-hover:hover{
     text-shadow: 5px 6px 12px  ;
     transform: scale(1.1);
+}
+
+.prevent-select {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
 }
 </style>
