@@ -17,6 +17,7 @@
       "NLP"
     ],
     "url": "https://toetspws.web.app/",
+    "github": "https://github.com/TanteJossa/PWS-GradeWithAi",
     "status": "Completed",
     "team": [
       "J. K. Wijker",
@@ -194,7 +195,7 @@
     "id": "literary-analysis-ai",
     "title": "Literary Research AI Automator",
     "date": "2024-03-15T12:00:00.000Z",
-    "rank": 0,
+    "rank": 8,
     "tags": [
       "AI",
       "Research Automation",
@@ -248,6 +249,7 @@
       "LaTeX"
     ],
     "url": "https://formule-trainer.web.app",
+    "github": "https://github.com/TanteJossa/formuletrainer",
     "status": "Live",
     "team": [
       "Joost Koch"

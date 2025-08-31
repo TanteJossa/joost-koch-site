@@ -4,10 +4,12 @@ div.h-100.pa-4.project-detail-scroll(v-if="project")
         h2.text-grey.mr-2(v-if="project.rank") \#{{project.rank}}
         h2 {{ project.title }}
         v-spacer
-        v-btn(v-if="project.url" :href="project.url" target="_blank" icon variant="text" density="compact")
-            v-icon(icon="mdi-open-in-new")
-        v-btn(v-if="project.github" :href="project.github" target="_blank" icon variant="text" density="compact")
-            v-icon(icon="mdi-github")
+        v-btn(v-if="project.url" :href="project.url" target="_blank" variant="tonal" prepend-icon="mdi-open-in-new" color="secondary" ) Demo
+            //- v-icon(icon="mdi-open-in-new")
+        v-spacer
+        v-btn(v-if="project.github" :href="project.github" target="_blank" variant="tonal" prepend-icon="mdi-github" color="secondary") Github
+            //- v-icon(icon="mdi-github")
+            //-)
 
     p.text-caption.text-grey-darken-1
         span(v-if="project.date") {{ getPrettyDate(project.date) }}
